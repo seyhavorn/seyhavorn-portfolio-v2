@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-// Disable browser's automatic scroll restoration on page refresh
-// This prevents the browser from scrolling to the previous position before Vue can handle it
+// Let Vue Router handle scroll restoration, not the browser
 if ('scrollRestoration' in history) {
   history.scrollRestoration = 'manual'
 }
@@ -21,14 +20,28 @@ const router = createRouter({
     },
   ],
   scrollBehavior(to, _from, savedPosition) {
-    // If navigating with back/forward buttons, restore saved position
+    // Restore saved position on back/forward navigation
     if (savedPosition) return savedPosition
-    // If navigating to a hash (e.g. #about), scroll to that element
+
     if (to.hash) {
+      // Detect initial page load/refresh: _from has no name on first navigation
+      const isInitialLoad = !_from.name
+
+      if (isInitialLoad) {
+        // On refresh: jump instantly to the hash section — no animation, no "top first" flash
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve({ el: to.hash, behavior: 'instant', top: 80 })
+          }, 50)
+        })
+      }
+
+      // In-app nav (clicking navbar links): smooth scroll
       return { el: to.hash, behavior: 'smooth', top: 80 }
     }
-    // Otherwise scroll to top
-    return { top: 0 }
+
+    // Default: scroll to top
+    return { top: 0, behavior: 'instant' }
   },
 })
 

@@ -101,8 +101,20 @@ function scrollTo(id: string) {
 .hero-orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(100px);
+  filter: blur(80px);
   animation: hero-float 25s infinite alternate ease-in-out;
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Reduce GPU-heavy blur on mobile */
+@media (max-width: 768px) {
+  .hero-orb {
+    filter: blur(50px);
+    opacity: 0.5;
+    animation-duration: 40s;
+  }
 }
 
 @keyframes hero-float {

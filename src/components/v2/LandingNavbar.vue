@@ -93,6 +93,9 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const navLinks = [
   { id: 'about', label: 'About' },
@@ -111,6 +114,8 @@ function scrollTo(id: string) {
   if (el) {
     el.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
+  // Update URL hash so the position is saved (e.g. /#about)
+  router.replace({ hash: `#${id}` })
 }
 
 function onScroll() {
@@ -143,5 +148,13 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 .slide-down-leave-to {
   opacity: 0;
   transform: translateY(-8px);
+}
+
+/* Reduce backdrop-blur on mobile for the sticky navbar */
+@media (max-width: 768px) {
+  nav {
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+  }
 }
 </style>

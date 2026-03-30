@@ -75,6 +75,9 @@
               <img
                 :src="info.photoUrl"
                 :alt="`${info.firstName} ${info.lastName}`"
+                loading="lazy"
+                width="380"
+                height="507"
                 class="w-full max-w-[380px] aspect-[3/4] object-cover object-center rounded-[21px] grayscale-[20%] group-hover:grayscale-0 transition-all duration-700"
               />
             </div>
