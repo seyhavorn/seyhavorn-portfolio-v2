@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import { Analytics } from "@vercel/analytics/vue"
+</script>
+
 <template>
   <div class="relative min-h-screen">
     <!-- Animated Background Blobs -->
@@ -10,5 +14,8 @@
 
     <!-- Router View -->
     <router-view />
+
+    <!-- Vercel Analytics -->
+    <Analytics />
   </div>
 </template>
