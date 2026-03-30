@@ -15,7 +15,7 @@
 
       <!-- Center text -->
       <p class="text-[12px] text-[var(--text-tertiary)] font-mono tracking-wider text-center">
-        © {{ new Date().getFullYear() }} Seyha Vorn · Built with Vue 3 & Tailwind CSS
+        © {{ new Date().getFullYear() }} Seyha Vorn
       </p>
 
       <!-- Social links -->

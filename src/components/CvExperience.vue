@@ -4,7 +4,11 @@
       <span class="w-1.5 h-1.5 rounded-full bg-teal-400 shadow-[0_0_10px_rgba(45,212,191,0.8)]"></span> Experience
     </div>
 
-    <div class="mb-10 relative">
+    <div
+      v-for="(experience, cIndex) in experiences"
+      :key="cIndex"
+      class="mb-10 relative"
+    >
       <!-- Glow Line Background -->
       <div class="absolute left-[20px] top-6 bottom-0 w-[2px] bg-gradient-to-b from-teal-500/50 via-blue-500/20 to-transparent z-0"></div>
 
@@ -63,7 +67,7 @@
 
 <script setup lang="ts">
 import { cvData } from '../data/cv'
-const experience = cvData.experience
+const experiences = cvData.experiences
 
 const getTagClass = (type: string) => {
   const base = "font-mono text-[11px] px-3 py-1 rounded-md font-medium border backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5"

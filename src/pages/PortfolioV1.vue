@@ -21,7 +21,7 @@ import CvSidebar from '../components/CvSidebar.vue'
 
     <footer class="mt-20 pt-8 border-t border-[var(--border)] text-center text-[11px] text-[var(--text-tertiary)] tracking-widest uppercase font-mono relative">
       <div class="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-teal-500/30 to-transparent"></div>
-      Last updated · 2026 Edition
+      © {{ new Date().getFullYear() }} Seyha Vorn
     </footer>
   </div>
 </template>
