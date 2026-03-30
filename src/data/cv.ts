@@ -1,3 +1,44 @@
+// ── Duration helpers ────────────────────────────────────────────────
+const MONTH_NAMES = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+]
+
+/** Calculate human-readable duration between two dates. */
+function calcDuration(startYear: number, startMonth: number, endYear?: number, endMonth?: number): string {
+  const now = new Date()
+  const eYear = endYear ?? now.getFullYear()
+  const eMonth = endMonth ?? now.getMonth() + 1 // 1-indexed
+
+  let totalMonths = (eYear - startYear) * 12 + (eMonth - startMonth) + 1 // +1 to include current month (matches LinkedIn)
+  if (totalMonths < 0) totalMonths = 0
+
+  const years = Math.floor(totalMonths / 12)
+  const months = totalMonths % 12
+
+  if (years > 0 && months > 0) return `${years} yr${years > 1 ? 's' : ''} ${months} mo${months > 1 ? 's' : ''}`
+  if (years > 0) return `${years} yr${years > 1 ? 's' : ''}`
+  if (months > 0) return `${months} mo${months > 1 ? 's' : ''}`
+  return '< 1 mo'
+}
+
+/** Format "MMM YYYY – MMM YYYY · duration" or "MMM YYYY – Present · duration". */
+function formatPeriod(
+  startYear: number, startMonth: number,
+  endYear?: number, endMonth?: number,
+): string {
+  const startLabel = `${MONTH_NAMES[startMonth - 1]} ${startYear}`
+  const endLabel = (endYear && endMonth)
+    ? `${MONTH_NAMES[endMonth - 1]} ${endYear}`
+    : 'Present'
+  const dur = calcDuration(startYear, startMonth, endYear, endMonth)
+  return `${startLabel} – ${endLabel} · ${dur}`
+}
+
+// ── Career-wide start date (internship) ─────────────────────────────
+const CAREER_START_YEAR = 2022
+const CAREER_START_MONTH = 5 // May
+
 export const cvData = {
   personalInfo: {
     firstName: "Seyha",
@@ -5,7 +46,7 @@ export const cvData = {
     // photoUrl: new URL('../assets/MrVorn_Seyha.JPG', import.meta.url).href,
     photoUrl: new URL('../assets/vornseyha.png', import.meta.url).href,
     title: "Senior Software Engineer · Full Stack",
-    experienceDuration: "3 yrs 11 mos",
+    experienceDuration: calcDuration(CAREER_START_YEAR, CAREER_START_MONTH),
     location: "Phnom Penh, Cambodia · On-site / Remote",
     email: "vornseyha4758@gmail.com",
     linkedin: "linkedin.com/in/seyha-vorn",
@@ -14,17 +55,17 @@ export const cvData = {
     githubUrl: "https://github.com/seyhavorn"
   },
   profile: {
-    summary: "Senior Full Stack Software Engineer with nearly 4 years of progressive experience at BRONX Technology Co., Ltd. Expert in Spring Boot microservices, Laravel, and Angular/Vue.js ecosystems. Proven track record in AI integration (RAG, Spring AI, Ollama, OpenAI), cloud infrastructure (AWS, Docker, Kubernetes), and high-performance database optimization. Passionate about building scalable, intelligent systems and mentoring engineering teams."
+    summary: `Senior Full Stack Software Engineer with ${calcDuration(CAREER_START_YEAR, CAREER_START_MONTH)} of progressive experience at BRONX Technology Co., Ltd. Expert in Spring Boot microservices, Laravel, and Angular/Vue.js ecosystems. Proven track record in AI integration (RAG, Spring AI, Ollama, OpenAI), cloud infrastructure (AWS, Docker, Kubernetes), and high-performance database optimization. Passionate about building scalable, intelligent systems and mentoring engineering teams.`
   },
   experience: {
     company: "BRONX Technology Co., Ltd.",
-    totalDuration: "3 yrs 11 mos",
+    totalDuration: calcDuration(CAREER_START_YEAR, CAREER_START_MONTH),
     location: "Phnom Penh, Cambodia",
     type: "Full-time",
     jobs: [
       {
         title: "Senior Software Engineer",
-        period: "Aug 2025 – Present · 8 mos",
+        period: formatPeriod(2025, 8),          // Aug 2025 – Present (dynamic)
         location: "Phnom Penh, Cambodia · On-site",
         description: "Leading backend architecture and microservices design for core platform services. Driving AI integration using Spring AI, RAG pipelines, Ollama, and OpenAI. Owning server setup, domain configuration, and container orchestration on Ubuntu. Mentoring engineers, overseeing DB performance tuning, and establishing cross-team API contracts with observability practices.",
         tags: [
@@ -60,7 +101,7 @@ export const cvData = {
       },
       {
         title: "Software Engineer",
-        period: "Mar 2024 – Jul 2025 · 1 yr 5 mos",
+        period: formatPeriod(2024, 3, 2025, 7),   // Mar 2024 – Jul 2025
         location: "Phnom Penh, Cambodia · On-site",
         description: "Built and maintained scalable RESTful and GraphQL APIs using Spring Boot microservices architecture. Contributed to frontend delivery with Angular and Vue.js. Improved service reliability through JUnit and MockMvc testing. Managed deployments via Docker, Kubernetes, and CI/CD pipelines on AWS and cPanel, following solid software design principles.",
         tags: [
@@ -84,7 +125,7 @@ export const cvData = {
       },
       {
         title: "Junior Software Engineer",
-        period: "Aug 2022 – Feb 2024 · 1 yr 7 mos",
+        period: formatPeriod(2022, 8, 2024, 2),   // Aug 2022 – Feb 2024
         location: "Cambodia · On-site",
         description: "Developed full-stack web applications using Laravel and NestJS on the backend, and Angular with TypeScript on the frontend. Built and consumed RESTful APIs serving both web and mobile clients. Crafted responsive UIs with Bootstrap, HTML, CSS, and jQuery. Managed PostgreSQL databases and participated in Agile sprints and code reviews.",
         tags: [
@@ -104,7 +145,7 @@ export const cvData = {
       },
       {
         title: "Software Engineer Internship",
-        period: "May 2022 – Jul 2022 · 3 mos",
+        period: formatPeriod(2022, 5, 2022, 7),   // May 2022 – Jul 2022
         location: "Phnom Penh, Cambodia",
         description: "Built and maintained web modules using Laravel and PHP within a production codebase. Developed responsive UI components with Bootstrap, HTML, and CSS, and enhanced interactivity through jQuery and JavaScript. Worked with PostgreSQL to design and query relational data structures for internal applications.",
         tags: [
