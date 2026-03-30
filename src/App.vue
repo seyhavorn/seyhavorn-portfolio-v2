@@ -1,8 +1,9 @@
-<script setup lang="ts">
-import { Analytics } from "@vercel/analytics/vue"
+<script setup>
+import { Analytics } from '@vercel/analytics/vue';
 </script>
 
 <template>
+  <Analytics />
   <div class="relative min-h-screen">
     <!-- Animated Background Blobs -->
     <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
