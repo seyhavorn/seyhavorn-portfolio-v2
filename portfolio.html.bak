@@ -1,0 +1,937 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Seyha Vorn – Senior Software Engineer</title>
+    <meta name="description" content="CV of Seyha Vorn – Full Stack Senior Software Engineer specializing in Spring Boot, Laravel, and Angular." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;400;500;600;700&family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,700;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --accent: #0ea573;
+        --accent-soft: #d1fae5;
+        --accent-dark: #065f46;
+        --accent-gradient: linear-gradient(135deg, #0ea573 0%, #0891b2 100%);
+
+        --blue: #0891b2;
+        --blue-soft: #cffafe;
+        --blue-dark: #155e75;
+
+        --purple: #7c3aed;
+        --purple-soft: #ede9fe;
+        --purple-dark: #5b21b6;
+
+        --amber: #d97706;
+        --amber-soft: #fef3c7;
+        --amber-dark: #92400e;
+
+        --text-primary: #0f172a;
+        --text-secondary: #475569;
+        --text-tertiary: #94a3b8;
+        --border: #e2e8f0;
+        --border-light: #f1f5f9;
+        --bg: #ffffff;
+        --bg-card: #f8fafc;
+        --bg-sidebar: #f1f5f9;
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+        --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+        --shadow-lg: 0 8px 30px rgba(0,0,0,0.1);
+        --radius: 12px;
+        --radius-sm: 8px;
+        --radius-full: 9999px;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --accent: #34d399;
+          --accent-soft: #064e3b;
+          --accent-dark: #6ee7b7;
+          --accent-gradient: linear-gradient(135deg, #34d399 0%, #22d3ee 100%);
+
+          --blue: #22d3ee;
+          --blue-soft: #164e63;
+          --blue-dark: #67e8f9;
+
+          --purple: #a78bfa;
+          --purple-soft: #2e1065;
+          --purple-dark: #c4b5fd;
+
+          --amber: #fbbf24;
+          --amber-soft: #451a03;
+          --amber-dark: #fcd34d;
+
+          --text-primary: #f1f5f9;
+          --text-secondary: #94a3b8;
+          --text-tertiary: #64748b;
+          --border: #334155;
+          --border-light: #1e293b;
+          --bg: #0f172a;
+          --bg-card: #1e293b;
+          --bg-sidebar: #1e293b;
+          --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+          --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+          --shadow-lg: 0 8px 30px rgba(0,0,0,0.5);
+        }
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: var(--bg);
+        color: var(--text-primary);
+        -webkit-font-smoothing: antialiased;
+        line-height: 1.6;
+      }
+
+      .cv {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 2.5rem 2rem;
+      }
+
+      /* ─── HEADER ─── */
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        padding: 2rem 2.5rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-md);
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--accent-gradient);
+      }
+
+      .photo-area {
+        flex-shrink: 0;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 3px solid var(--accent);
+        box-shadow: 0 0 0 4px var(--accent-soft), var(--shadow-md);
+        position: relative;
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .photo-area:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 6px var(--accent-soft), var(--shadow-lg);
+      }
+
+      .photo-area img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .header-content {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1.5rem;
+      }
+
+      .name-block {
+        flex: 1;
+      }
+
+      .name {
+        font-family: "Playfair Display", serif;
+        font-size: 42px;
+        font-weight: 700;
+        line-height: 1.1;
+        letter-spacing: -1px;
+        color: var(--text-primary);
+      }
+
+      .name .accent {
+        font-style: italic;
+        background: var(--accent-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .title-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 10px;
+        padding: 5px 14px;
+        background: var(--accent-soft);
+        border: 1px solid var(--accent);
+        border-radius: var(--radius-full);
+        font-family: "DM Mono", monospace;
+        font-size: 12px;
+        color: var(--accent-dark);
+        font-weight: 500;
+        letter-spacing: 0.3px;
+      }
+
+      .title-badge .pulse {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--accent);
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(1.3); }
+      }
+
+      .contacts {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 5px;
+        flex-shrink: 0;
+      }
+
+      .contact-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12.5px;
+        color: var(--text-secondary);
+        text-decoration: none;
+        padding: 3px 10px;
+        border-radius: var(--radius-sm);
+        transition: all 0.2s ease;
+      }
+
+      a.contact-item:hover {
+        background: var(--bg-sidebar);
+        color: var(--accent);
+      }
+
+      .contact-icon {
+        width: 14px;
+        height: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .contact-icon svg {
+        width: 14px;
+        height: 14px;
+        fill: currentColor;
+      }
+
+      /* ─── PROFILE ─── */
+      .section {
+        margin-bottom: 2rem;
+      }
+
+      .section-label {
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 1rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .section-label::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+
+      .summary {
+        font-size: 15px;
+        line-height: 1.85;
+        color: var(--text-secondary);
+        font-weight: 300;
+        padding: 1.25rem 1.5rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        border-left: 3px solid var(--accent);
+      }
+
+      /* ─── LAYOUT ─── */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 2.5rem;
+      }
+
+      /* ─── EXPERIENCE ─── */
+      .company-block {
+        margin-bottom: 2rem;
+      }
+
+      .company-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 4px;
+      }
+
+      .company-name {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .company-duration {
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        color: var(--accent-dark);
+        background: var(--accent-soft);
+        border: 1px solid var(--accent);
+        padding: 2px 10px;
+        border-radius: var(--radius-full);
+        font-weight: 500;
+      }
+
+      .company-meta {
+        font-size: 12px;
+        color: var(--text-tertiary);
+        font-family: "DM Mono", monospace;
+        margin-bottom: 14px;
+      }
+
+      .job {
+        margin-bottom: 12px;
+        padding: 16px 18px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        border-left: 3px solid var(--accent);
+        transition: box-shadow 0.2s ease, transform 0.2s ease;
+        position: relative;
+      }
+
+      .job:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-1px);
+      }
+
+      .job:last-child {
+        margin-bottom: 0;
+      }
+
+      .job-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 3px;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .job-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .job-period {
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        color: var(--text-tertiary);
+      }
+
+      .job-location {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .job-location::before {
+        content: "📍";
+        font-size: 11px;
+      }
+
+      .job-desc {
+        font-size: 13px;
+        line-height: 1.75;
+        color: var(--text-secondary);
+        font-weight: 300;
+        margin-bottom: 12px;
+      }
+
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+
+      .tag {
+        font-family: "DM Mono", monospace;
+        font-size: 10.5px;
+        padding: 3px 10px;
+        border-radius: var(--radius-full);
+        font-weight: 500;
+        border: 1px solid;
+        transition: transform 0.15s ease;
+      }
+
+      .tag:hover {
+        transform: scale(1.05);
+      }
+
+      .tag-green {
+        background: var(--accent-soft);
+        color: var(--accent-dark);
+        border-color: var(--accent);
+      }
+
+      .tag-blue {
+        background: var(--blue-soft);
+        color: var(--blue-dark);
+        border-color: var(--blue);
+      }
+
+      .tag-purple {
+        background: var(--purple-soft);
+        color: var(--purple-dark);
+        border-color: var(--purple);
+      }
+
+      .tag-amber {
+        background: var(--amber-soft);
+        color: var(--amber-dark);
+        border-color: var(--amber);
+      }
+
+      /* ─── SIDEBAR ─── */
+      .sidebar-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.25rem;
+        box-shadow: var(--shadow-sm);
+        transition: box-shadow 0.2s ease;
+      }
+
+      .sidebar-card:hover {
+        box-shadow: var(--shadow-md);
+      }
+
+      .sidebar-card .section-label {
+        margin-bottom: 0.85rem;
+      }
+
+      /* Skills */
+      .skill-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 7px 0;
+        border-bottom: 1px solid var(--border-light);
+      }
+
+      .skill-row:last-child {
+        border-bottom: none;
+      }
+
+      .skill-name {
+        font-size: 13px;
+        font-weight: 400;
+        color: var(--text-primary);
+      }
+
+      .skill-bar-track {
+        width: 80px;
+        height: 5px;
+        background: var(--border);
+        border-radius: var(--radius-full);
+        overflow: hidden;
+      }
+
+      .skill-bar-fill {
+        height: 100%;
+        border-radius: var(--radius-full);
+        background: var(--accent-gradient);
+        transition: width 0.6s ease;
+      }
+
+      /* Stack Grid */
+      .stack-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+      }
+
+      .stack-tag {
+        font-family: "DM Mono", monospace;
+        font-size: 10.5px;
+        text-align: center;
+        padding: 6px 4px;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text-secondary);
+        font-weight: 500;
+        transition: all 0.2s ease;
+      }
+
+      .stack-tag:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+        background: var(--accent-soft);
+      }
+
+      /* Education */
+      .edu-item {
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border-light);
+      }
+
+      .edu-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
+
+      .edu-degree {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .edu-school {
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin-top: 2px;
+      }
+
+      .edu-year {
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        color: var(--text-tertiary);
+        margin-top: 3px;
+      }
+
+      /* Languages */
+      .lang-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--border-light);
+        color: var(--text-secondary);
+      }
+
+      .lang-row:last-child {
+        border-bottom: none;
+      }
+
+      .lang-level {
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        color: var(--accent);
+        background: var(--accent-soft);
+        padding: 2px 8px;
+        border-radius: var(--radius-full);
+        font-weight: 500;
+      }
+
+      /* Contact Sidebar */
+      .contact-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 12.5px;
+        color: var(--text-secondary);
+        padding: 6px 0;
+        border-bottom: 1px solid var(--border-light);
+      }
+
+      .contact-row:last-child {
+        border-bottom: none;
+      }
+
+      .contact-row a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+
+      .contact-row a:hover {
+        color: var(--accent);
+      }
+
+      .contact-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--accent-gradient);
+        flex-shrink: 0;
+      }
+
+      /* ─── FOOTER ─── */
+      .footer {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border);
+        text-align: center;
+        font-size: 11px;
+        color: var(--text-tertiary);
+        font-family: "DM Mono", monospace;
+      }
+
+      /* ─── PRINT ─── */
+      @media print {
+        body {
+          background: #fff;
+          color: #000;
+        }
+        .cv {
+          padding: 1rem;
+          max-width: 100%;
+        }
+        .header {
+          box-shadow: none;
+          border: 1px solid #ddd;
+        }
+        .header::before {
+          display: none;
+        }
+        .job:hover, .sidebar-card:hover, .stack-tag:hover, .tag:hover, .photo-area:hover {
+          transform: none;
+          box-shadow: none;
+        }
+        .title-badge .pulse {
+          animation: none;
+        }
+      }
+
+      /* ─── RESPONSIVE ─── */
+      @media (max-width: 768px) {
+        .cv {
+          padding: 1rem;
+        }
+        .grid-2 {
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+        }
+        .header {
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          padding: 1.5rem;
+        }
+        .header-top {
+          flex-direction: column;
+          align-items: center;
+        }
+        .name-block {
+          text-align: center;
+        }
+        .contacts {
+          align-items: center;
+        }
+        .name {
+          font-size: 32px;
+        }
+        .photo-area {
+          width: 100px;
+          height: 100px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="cv">
+
+      <!-- HEADER WITH PHOTO -->
+      <header class="header" id="cv-header">
+        <div class="photo-area" id="photo-area" title="Replace with your photo">
+          <img src="../photo-placeholder.png" alt="Seyha Vorn profile photo" id="profile-photo" />
+        </div>
+        <div class="header-content">
+          <div class="header-top">
+            <div class="name-block">
+              <h1 class="name">Seyha <span class="accent">Vorn</span></h1>
+              <div class="title-badge">
+                <span class="pulse"></span>
+                Senior Software Engineer · Full Stack · 3 yrs 11 mos
+              </div>
+            </div>
+            <div class="contacts">
+              <a class="contact-item" href="mailto:seyha.vorn@gmail.com" id="contact-email">
+                <span class="contact-icon">
+                  <svg viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
+                </span>
+                seyha.vorn@gmail.com
+              </a>
+              <a class="contact-item" href="https://www.linkedin.com/in/seyha-vorn/" target="_blank" id="contact-linkedin">
+                <span class="contact-icon">
+                  <svg viewBox="0 0 20 20"><path d="M16.338 16.338H13.67V12.16c0-.995-.017-2.277-1.387-2.277-1.39 0-1.601 1.086-1.601 2.207v4.248H8.014V8h2.559v1.174h.037c.356-.675 1.227-1.387 2.526-1.387 2.703 0 3.203 1.778 3.203 4.092v4.459zM5.005 6.575a1.548 1.548 0 11-.003-3.096 1.548 1.548 0 01.003 3.096zm1.336 9.763H3.667V8h2.674v8.338zM17.668 1H2.328C1.595 1 1 1.581 1 2.298v15.403C1 18.418 1.595 19 2.328 19h15.34c.734 0 1.332-.582 1.332-1.299V2.298C19 1.581 18.402 1 17.668 1z"/></svg>
+                </span>
+                linkedin.com/in/seyha-vorn
+              </a>
+              <a class="contact-item" href="https://github.com/seyhavorn" target="_blank" id="contact-github">
+                <span class="contact-icon">
+                  <svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clip-rule="evenodd"/></svg>
+                </span>
+                github.com/seyhavorn
+              </a>
+              <span class="contact-item" id="contact-location">
+                <span class="contact-icon">
+                  <svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+                </span>
+                Phnom Penh, Cambodia · On-site / Remote
+              </span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- PROFILE -->
+      <section class="section" id="profile-section">
+        <div class="section-label">Profile</div>
+        <p class="summary">
+          Full stack software engineer with nearly 4 years of experience
+          progressing from internship to Senior Engineer at Bronx Technology
+          Co., Ltd. Specializes in Spring Boot microservices, Laravel, and
+          Angular ecosystems. Passionate about building scalable backend
+          services and clean frontend interfaces in fast-paced product teams.
+        </p>
+      </section>
+
+      <!-- MAIN CONTENT -->
+      <div class="grid-2">
+        <!-- LEFT: EXPERIENCE -->
+        <div>
+          <section class="section" id="experience-section">
+            <div class="section-label">Experience</div>
+
+            <div class="company-block">
+              <div class="company-header">
+                <span class="company-name">Bronx Technology Co., Ltd.</span>
+                <span class="company-duration">3 yrs 11 mos</span>
+              </div>
+              <div class="company-meta">Phnom Penh, Cambodia · Full-time</div>
+
+              <div class="job" id="job-senior">
+                <div class="job-header">
+                  <span class="job-title">Senior Software Engineer</span>
+                  <span class="job-period">Aug 2025 – Present · 8 mos</span>
+                </div>
+                <div class="job-location">Phnom Penh, Cambodia · On-site</div>
+                <p class="job-desc">
+                  Leading backend architecture decisions for core platform
+                  services. Driving microservices adoption and mentoring junior
+                  engineers. Owning system design reviews and cross-team API
+                  contracts.
+                </p>
+                <div class="tags">
+                  <span class="tag tag-green">Spring Boot</span>
+                  <span class="tag tag-green">Microservices</span>
+                  <span class="tag tag-blue">Docker</span>
+                  <span class="tag tag-blue">Kubernetes</span>
+                  <span class="tag tag-purple">System Design</span>
+                </div>
+              </div>
+
+              <div class="job" id="job-mid">
+                <div class="job-header">
+                  <span class="job-title">Software Engineer</span>
+                  <span class="job-period">Mar 2024 – Jul 2025 · 1 yr 5 mos</span>
+                </div>
+                <div class="job-location">Phnom Penh, Cambodia · On-site</div>
+                <p class="job-desc">
+                  Built and maintained scalable RESTful APIs and microservices.
+                  Collaborated with frontend teams to deliver end-to-end product
+                  features. Improved service reliability through better testing
+                  and CI/CD practices.
+                </p>
+                <div class="tags">
+                  <span class="tag tag-green">Spring Boot</span>
+                  <span class="tag tag-green">Microservices</span>
+                  <span class="tag tag-blue">PostgreSQL</span>
+                  <span class="tag tag-blue">Redis</span>
+                </div>
+              </div>
+
+              <div class="job" id="job-junior">
+                <div class="job-header">
+                  <span class="job-title">Junior Software Engineer</span>
+                  <span class="job-period">Aug 2022 – Feb 2024 · 1 yr 7 mos</span>
+                </div>
+                <div class="job-location">Cambodia · On-site</div>
+                <p class="job-desc">
+                  Developed full stack features using Laravel and Angular.
+                  Implemented RESTful APIs consumed by web and mobile clients.
+                  Participated in code reviews and Agile sprints.
+                </p>
+                <div class="tags">
+                  <span class="tag tag-green">Laravel</span>
+                  <span class="tag tag-green">Angular</span>
+                  <span class="tag tag-blue">MySQL</span>
+                  <span class="tag tag-amber">REST API</span>
+                </div>
+              </div>
+
+              <div class="job" id="job-intern">
+                <div class="job-header">
+                  <span class="job-title">Software Engineer Internship</span>
+                  <span class="job-period">May 2022 – Jul 2022 · 3 mos</span>
+                </div>
+                <div class="job-location">Phnom Penh, Cambodia</div>
+                <p class="job-desc">
+                  Contributed to internal tooling and web modules. Gained
+                  hands-on experience with PHP and Laravel in a production
+                  codebase.
+                </p>
+                <div class="tags">
+                  <span class="tag tag-green">PHP</span>
+                  <span class="tag tag-green">Laravel</span>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- RIGHT: SIDEBAR -->
+        <div>
+          <!-- Technical Skills -->
+          <div class="sidebar-card" id="skills-card">
+            <div class="section-label">Technical Skills</div>
+            <div class="skill-row">
+              <span class="skill-name">Spring Boot / Java</span>
+              <div class="skill-bar-track"><div class="skill-bar-fill" style="width:100%"></div></div>
+            </div>
+            <div class="skill-row">
+              <span class="skill-name">Microservices</span>
+              <div class="skill-bar-track"><div class="skill-bar-fill" style="width:100%"></div></div>
+            </div>
+            <div class="skill-row">
+              <span class="skill-name">Laravel / PHP</span>
+              <div class="skill-bar-track"><div class="skill-bar-fill" style="width:80%"></div></div>
+            </div>
+            <div class="skill-row">
+              <span class="skill-name">Angular</span>
+              <div class="skill-bar-track"><div class="skill-bar-fill" style="width:80%"></div></div>
+            </div>
+            <div class="skill-row">
+              <span class="skill-name">PostgreSQL / MySQL</span>
+              <div class="skill-bar-track"><div class="skill-bar-fill" style="width:80%"></div></div>
+            </div>
+            <div class="skill-row">
+              <span class="skill-name">Docker / Kubernetes</span>
+              <div class="skill-bar-track"><div class="skill-bar-fill" style="width:60%"></div></div>
+            </div>
+            <div class="skill-row">
+              <span class="skill-name">REST API / GraphQL</span>
+              <div class="skill-bar-track"><div class="skill-bar-fill" style="width:80%"></div></div>
+            </div>
+            <div class="skill-row">
+              <span class="skill-name">CI / CD</span>
+              <div class="skill-bar-track"><div class="skill-bar-fill" style="width:60%"></div></div>
+            </div>
+          </div>
+
+          <!-- Current Stack -->
+          <div class="sidebar-card" id="stack-card">
+            <div class="section-label">Current Stack</div>
+            <div class="stack-grid">
+              <span class="stack-tag">Spring Boot</span>
+              <span class="stack-tag">Angular</span>
+              <span class="stack-tag">Laravel</span>
+              <span class="stack-tag">Docker</span>
+              <span class="stack-tag">K8s</span>
+              <span class="stack-tag">Redis</span>
+              <span class="stack-tag">PostgreSQL</span>
+              <span class="stack-tag">MySQL</span>
+              <span class="stack-tag">GitHub CI</span>
+            </div>
+          </div>
+
+          <!-- Education -->
+          <div class="sidebar-card" id="education-card">
+            <div class="section-label">Education</div>
+            <div class="edu-item">
+              <div class="edu-degree">BSc Computer Science</div>
+              <div class="edu-school">Royal University of Phnom Penh</div>
+              <div class="edu-year">2018 – 2022</div>
+            </div>
+          </div>
+
+          <!-- Languages -->
+          <div class="sidebar-card" id="languages-card">
+            <div class="section-label">Languages</div>
+            <div class="lang-row">
+              Khmer <span class="lang-level">native</span>
+            </div>
+            <div class="lang-row">
+              English <span class="lang-level">professional</span>
+            </div>
+          </div>
+
+          <!-- Contact -->
+          <div class="sidebar-card" id="contact-card">
+            <div class="section-label">Contact</div>
+            <div class="contact-row">
+              <div class="contact-dot"></div>
+              <a href="https://www.linkedin.com/in/seyha-vorn/" target="_blank">linkedin.com/in/seyha-vorn</a>
+            </div>
+            <div class="contact-row">
+              <div class="contact-dot"></div>
+              <a href="https://github.com/seyhavorn" target="_blank">github.com/seyhavorn</a>
+            </div>
+            <div class="contact-row">
+              <div class="contact-dot"></div>
+              Phnom Penh, Cambodia
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="footer">
+        Last updated · March 2026
+      </footer>
+    </div>
+  </body>
+</html>

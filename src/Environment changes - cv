@@ -1,0 +1,22 @@
+# Terminal Environment Changes
+
+## Extension: Anthropic.claude-code
+
+- `CLAUDE_CODE_SSE_PORT=57274`
+
+## Extension: vscode.git
+
+Enables the following features: git auth provider
+
+- `GIT_ASKPASS=/Applications/Antigravity.app/Contents/Resources/app/extensions/git/dist/askpass.sh`
+- `VSCODE_GIT_ASKPASS_NODE=/Applications/Antigravity.app/Contents/Frameworks/Antigravity Helper (Plugin).app/Contents/MacOS/Antigravity Helper (Plugin)`
+- `VSCODE_GIT_ASKPASS_EXTRA_ARGS=`
+- `VSCODE_GIT_ASKPASS_MAIN=/Applications/Antigravity.app/Contents/Resources/app/extensions/git/dist/askpass-main.js`
+- `VSCODE_GIT_IPC_HANDLE=/var/folders/qt/36fkmgt55cz5d945tsdp4bzm0000gn/T/vscode-git-5753c40adf.sock`
+
+## Extension: eamodio.gitlens
+
+Enables GK CLI integration
+
+- `GK_GL_ADDR=http://127.0.0.1:53805`
+- `GK_GL_PATH=/var/folders/qt/36fkmgt55cz5d945tsdp4bzm0000gn/T/gitkraken/gitlens/gitlens-ipc-server-31400-53805.json`
