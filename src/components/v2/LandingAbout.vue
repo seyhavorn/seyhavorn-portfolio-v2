@@ -98,10 +98,14 @@ const profile = cvData.profile
 const education = cvData.education
 const languages = cvData.languages
 
+const totalSkills = new Set(
+  cvData.experiences.flatMap(e => e.jobs.flatMap(j => j.tags.map(t => t.name)))
+).size
+
 const stats = [
-  { value: '4+', label: 'Years Exp' },
-  { value: '10+', label: 'Projects' },
-  { value: '5+', label: 'Services' },
-  { value: '3', label: 'Certs' },
+  { value: info.experienceDuration, label: 'Experience' },
+  { value: `${cvData.projects.length}+`, label: 'Projects' },
+  { value: `${totalSkills}+`, label: 'Skills' },
+  { value: `${cvData.certifications.length}`, label: 'Certs' },
 ]
 </script>

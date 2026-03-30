@@ -14,6 +14,15 @@
 
 ### 🧑‍💻 About Me
 
+```yaml
+name        : Vorn Seyha
+title       : Senior Full Stack Software Engineer
+experience  : ~4 years
+location    : Phnom Penh, Cambodia 🇰🇭
+availability: On-site / Remote
+languages   : Khmer (Native) · English (Professional)
+interests   : AI Engineering · System Design · Open Source
+```
 Senior Full Stack Software Engineer with **~4 years** of progressive experience at **BRONX Technology Co., Ltd.** in Phnom Penh, Cambodia.
 
 I specialise in **Spring Boot microservices**, **Laravel**, and **Angular / Vue.js** ecosystems. I have a strong track record in **AI integration** (RAG, Spring AI, Ollama, OpenAI), **cloud infrastructure** (AWS, Docker, Kubernetes), and **high-performance database optimisation**. Passionate about building scalable, intelligent systems and mentoring engineering teams.

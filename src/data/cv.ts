@@ -60,8 +60,8 @@ export const cvData = {
   personalInfo: {
     firstName: "Seyha",
     lastName: "Vorn",
-    // photoUrl: new URL('../assets/MrVorn_Seyha.JPG', import.meta.url).href,
-    photoUrl: new URL("../assets/vornseyha.png", import.meta.url).href,
+    // photoUrl: new URL("../assets/vornseyha.png", import.meta.url).href,
+    photoUrl: new URL("../assets/seyhavorn_stand.JPG", import.meta.url).href,
     title: "Senior Software Engineer · Full Stack",
     experienceDuration: calcDuration(CAREER_START_YEAR, CAREER_START_MONTH),
     location: "Phnom Penh, Cambodia · On-site / Remote",
