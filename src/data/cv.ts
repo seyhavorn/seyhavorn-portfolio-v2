@@ -56,7 +56,7 @@ function formatPeriod(
 const CAREER_START_YEAR = 2022;
 const CAREER_START_MONTH = 5; // May
 
-export const cvData = {
+const cvData = {
   personalInfo: {
     firstName: "Seyha",
     lastName: "Vorn",
@@ -72,7 +72,7 @@ export const cvData = {
     githubUrl: "https://github.com/seyhavorn",
   },
   profile: {
-    summary: `Senior Full Stack Software Engineer with ${calcDuration(CAREER_START_YEAR, CAREER_START_MONTH)} of progressive experience at BRONX Technology Co., Ltd. Expert in Spring Boot microservices, Laravel, and Angular/Vue.js ecosystems. Proven track record in AI integration (RAG, Spring AI, Ollama, OpenAI), cloud infrastructure (AWS, Docker, Kubernetes), and high-performance database optimization. Passionate about building scalable, intelligent systems and mentoring engineering teams.`,
+    summary: `Senior Full Stack Software Engineer with ${calcDuration(CAREER_START_YEAR, CAREER_START_MONTH)} of progressive experience. Expert in Spring Boot microservices, Laravel, and Angular/Vue.js ecosystems. Proven track record in AI integration (RAG, Spring AI, Ollama, OpenAI), cloud infrastructure (AWS, Docker, Kubernetes), and high-performance database optimization. Passionate about building scalable, intelligent systems and mentoring engineering teams.`,
   },
   experiences: [
     {
@@ -385,3 +385,5 @@ export const cvData = {
     },
   ],
 };
+
+export { cvData };
