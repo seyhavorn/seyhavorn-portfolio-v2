@@ -15,5 +15,8 @@ import { Analytics } from '@vercel/analytics/vue';
 
     <!-- Router View -->
     <router-view />
+
+    <!-- Vercel Analytics -->
+    <Analytics />
   </div>
 </template>
