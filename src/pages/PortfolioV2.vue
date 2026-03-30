@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import LandingNavbar from '../components/v2/LandingNavbar.vue'
 import LandingHero from '../components/v2/LandingHero.vue'
 import LandingAbout from '../components/v2/LandingAbout.vue'
@@ -8,6 +9,11 @@ import LandingExperience from '../components/v2/LandingExperience.vue'
 import LandingProjects from '../components/v2/LandingProjects.vue'
 import LandingContact from '../components/v2/LandingContact.vue'
 import LandingFooter from '../components/v2/LandingFooter.vue'
+
+// Ensure page starts at top on load/refresh
+onMounted(() => {
+  window.scrollTo(0, 0)
+})
 </script>
 
 <template>
