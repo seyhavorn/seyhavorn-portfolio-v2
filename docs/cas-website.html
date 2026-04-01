@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seyha Vorn — Project Portfolio</title>
+    <meta name="description" content="Project Portfolio of Seyha Vorn — Senior Software Engineer specializing in Spring Boot, AI/LLM, Microservices, Vue.js & Angular">
+    <meta property="og:title" content="Seyha Vorn — Project Portfolio">
+    <meta property="og:description" content="Senior Software Engineer | Spring Boot · AI/LLM · Microservices">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ═══════════════════════════════════════════════════════════
+           DESIGN TOKENS
+           ═══════════════════════════════════════════════════════════ */
+        :root {
+            /* Primary palette */
+            --color-bg: #0a0a0f;
+            --color-bg-elevated: #12121a;
+            --color-bg-card: #161622;
+            --color-bg-card-hover: #1c1c2e;
+            --color-border: rgba(255, 255, 255, 0.06);
+            --color-border-hover: rgba(255, 255, 255, 0.12);
+
+            /* Accent colors */
+            --accent-primary: #6366f1;
+            --accent-primary-glow: rgba(99, 102, 241, 0.25);
+            --accent-secondary: #a78bfa;
+            --accent-emerald: #34d399;
+            --accent-amber: #fbbf24;
+            --accent-rose: #f472b6;
+            --accent-cyan: #22d3ee;
+            --accent-sky: #38bdf8;
+
+            /* Text */
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-tertiary: #64748b;
+            --text-muted: #475569;
+
+            /* Typography */
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --space-3xl: 4rem;
+
+            /* Borders */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-full: 9999px;
+
+            /* Shadows */
+            --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.3), 0 1px 4px rgba(0, 0, 0, 0.2);
+            --shadow-hover: 0 8px 40px rgba(99, 102, 241, 0.15), 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-glow: 0 0 60px rgba(99, 102, 241, 0.08);
+
+            /* Page */
+            --max-width: 1100px;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           RESET & BASE
+           ═══════════════════════════════════════════════════════════ */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--color-bg);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Ambient background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.08), transparent),
+                radial-gradient(ellipse 60% 40% at 80% 80%, rgba(167, 139, 250, 0.05), transparent),
+                radial-gradient(ellipse 50% 30% at 10% 60%, rgba(52, 211, 153, 0.04), transparent);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        a:hover {
+            color: var(--accent-secondary);
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           LAYOUT
+           ═══════════════════════════════════════════════════════════ */
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 var(--space-xl);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           HEADER / HERO
+           ═══════════════════════════════════════════════════════════ */
+        .hero {
+            padding: var(--space-3xl) 0 var(--space-2xl);
+            text-align: center;
+            position: relative;
+        }
+
+        .hero__badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: 6px 16px;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--accent-secondary);
+            letter-spacing: 0.02em;
+            margin-bottom: var(--space-lg);
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .hero__badge-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent-emerald);
+            border-radius: 50%;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        .hero__name {
+            font-size: clamp(2.2rem, 5vw, 3.2rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+            margin-bottom: var(--space-sm);
+            animation: fadeInUp 0.6s ease-out 0.1s both;
+        }
+
+        .hero__name-gradient {
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-secondary) 50%, var(--accent-primary) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero__title {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-lg);
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+
+        .hero__links {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+            animation: fadeInUp 0.6s ease-out 0.3s both;
+        }
+
+        .hero__link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 18px;
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 1px solid var(--color-border);
+            background: var(--color-bg-elevated);
+            color: var(--text-secondary);
+        }
+
+        .hero__link:hover {
+            border-color: var(--accent-primary);
+            color: var(--text-primary);
+            background: rgba(99, 102, 241, 0.08);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.15);
+        }
+
+        .hero__link--primary {
+            background: linear-gradient(135deg, var(--accent-primary), #818cf8);
+            border-color: transparent;
+            color: white;
+        }
+
+        .hero__link--primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(99, 102, 241, 0.3);
+            color: white;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           SECTION HEADERS
+           ═══════════════════════════════════════════════════════════ */
+        .section {
+            margin-bottom: var(--space-3xl);
+        }
+
+        .section__header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .section__icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-md);
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .section__icon--purple {
+            background: rgba(99, 102, 241, 0.12);
+            color: var(--accent-primary);
+        }
+
+        .section__icon--emerald {
+            background: rgba(52, 211, 153, 0.12);
+            color: var(--accent-emerald);
+        }
+
+        .section__icon--amber {
+            background: rgba(251, 191, 36, 0.12);
+            color: var(--accent-amber);
+        }
+
+        .section__title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .section__subtitle {
+            font-size: 0.85rem;
+            color: var(--text-tertiary);
+            font-weight: 400;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           STATS BAR
+           ═══════════════════════════════════════════════════════════ */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--space-md);
+            margin-bottom: var(--space-3xl);
+            animation: fadeInUp 0.6s ease-out 0.4s both;
+        }
+
+        .stat {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg) var(--space-md);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat:hover {
+            border-color: var(--color-border-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-card);
+        }
+
+        .stat__value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat__value--purple { color: var(--accent-primary); }
+        .stat__value--emerald { color: var(--accent-emerald); }
+        .stat__value--amber { color: var(--accent-amber); }
+        .stat__value--cyan { color: var(--accent-cyan); }
+
+        .stat__label {
+            font-size: 0.78rem;
+            color: var(--text-tertiary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           PROJECT CARDS
+           ═══════════════════════════════════════════════════════════ */
+        .projects-grid {
+            display: grid;
+            gap: var(--space-lg);
+        }
+
+        .project-card {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.5s ease-out both;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--card-accent, var(--accent-primary)), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .project-card:hover {
+            border-color: var(--color-border-hover);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .project-card:hover::before {
+            opacity: 1;
+        }
+
+        .project-card--featured {
+            border-color: rgba(99, 102, 241, 0.15);
+            background: linear-gradient(135deg, var(--color-bg-card) 0%, rgba(99, 102, 241, 0.03) 100%);
+        }
+
+        .project-card__header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+
+        .project-card__icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .project-card__meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .project-card__badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: var(--radius-full);
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            white-space: nowrap;
+        }
+
+        .project-card__badge--featured {
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--accent-primary);
+        }
+
+        .project-card__badge--production {
+            background: rgba(52, 211, 153, 0.12);
+            color: var(--accent-emerald);
+        }
+
+        .project-card__badge--internal {
+            background: rgba(251, 191, 36, 0.12);
+            color: var(--accent-amber);
+        }
+
+        .project-card__title-row {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            flex: 1;
+        }
+
+        .project-card__name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        .project-card__role {
+            font-size: 0.78rem;
+            color: var(--text-tertiary);
+            font-weight: 500;
+        }
+
+        .project-card__description {
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            line-height: 1.7;
+            margin-bottom: var(--space-lg);
+        }
+
+        .project-card__highlights {
+            list-style: none;
+            margin-bottom: var(--space-lg);
+            display: grid;
+            gap: 8px;
+        }
+
+        .project-card__highlight {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .project-card__highlight-icon {
+            color: var(--accent-emerald);
+            font-size: 0.7rem;
+            margin-top: 5px;
+            flex-shrink: 0;
+        }
+
+        .project-card__footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+        }
+
+        .project-card__tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .project-card__tag {
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            font-size: 0.72rem;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-tertiary);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            font-family: var(--font-mono);
+            transition: all 0.2s ease;
+        }
+
+        .project-card__tag:hover {
+            background: rgba(99, 102, 241, 0.08);
+            border-color: rgba(99, 102, 241, 0.2);
+            color: var(--accent-secondary);
+        }
+
+        .project-card__link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            font-weight: 500;
+            background: rgba(99, 102, 241, 0.08);
+            color: var(--accent-primary);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .project-card__link:hover {
+            background: rgba(99, 102, 241, 0.15);
+            transform: translateX(2px);
+            color: var(--accent-secondary);
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           SKILLS SECTION
+           ═══════════════════════════════════════════════════════════ */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: var(--space-md);
+        }
+
+        .skill-category {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            transition: all 0.3s ease;
+        }
+
+        .skill-category:hover {
+            border-color: var(--color-border-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-card);
+        }
+
+        .skill-category__title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .skill-category__items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .skill-pill {
+            padding: 5px 12px;
+            border-radius: var(--radius-full);
+            font-size: 0.76rem;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.2s ease;
+        }
+
+        .skill-pill:hover {
+            background: rgba(99, 102, 241, 0.08);
+            border-color: rgba(99, 102, 241, 0.2);
+            color: var(--accent-secondary);
+            transform: translateY(-1px);
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           EDUCATION + CERTS
+           ═══════════════════════════════════════════════════════════ */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-md);
+        }
+
+        .info-card {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            display: flex;
+            gap: var(--space-md);
+            transition: all 0.3s ease;
+        }
+
+        .info-card:hover {
+            border-color: var(--color-border-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-card);
+        }
+
+        .info-card__icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .info-card__content {
+            flex: 1;
+        }
+
+        .info-card__title {
+            font-size: 0.92rem;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .info-card__subtitle {
+            font-size: 0.82rem;
+            color: var(--text-tertiary);
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           FOOTER
+           ═══════════════════════════════════════════════════════════ */
+        .footer {
+            text-align: center;
+            padding: var(--space-2xl) 0;
+            border-top: 1px solid var(--color-border);
+            margin-top: var(--space-3xl);
+        }
+
+        .footer__text {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        .footer__contact {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-lg);
+            flex-wrap: wrap;
+            margin-bottom: var(--space-md);
+        }
+
+        .footer__contact-item {
+            font-size: 0.82rem;
+            color: var(--text-tertiary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           ANIMATIONS
+           ═══════════════════════════════════════════════════════════ */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* Stagger project card animations */
+        .project-card:nth-child(1) { animation-delay: 0.1s; }
+        .project-card:nth-child(2) { animation-delay: 0.2s; }
+        .project-card:nth-child(3) { animation-delay: 0.3s; }
+        .project-card:nth-child(4) { animation-delay: 0.4s; }
+        .project-card:nth-child(5) { animation-delay: 0.5s; }
+        .project-card:nth-child(6) { animation-delay: 0.6s; }
+
+        /* ═══════════════════════════════════════════════════════════
+           DIVIDER
+           ═══════════════════════════════════════════════════════════ */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--color-border), transparent);
+            margin: var(--space-2xl) 0;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           PRINT STYLES
+           ═══════════════════════════════════════════════════════════ */
+        @media print {
+            :root {
+                --color-bg: #ffffff;
+                --color-bg-elevated: #f8f9fa;
+                --color-bg-card: #ffffff;
+                --color-border: #e2e8f0;
+                --text-primary: #1a1a2e;
+                --text-secondary: #475569;
+                --text-tertiary: #64748b;
+                --accent-primary: #4f46e5;
+                --accent-secondary: #7c3aed;
+                --accent-emerald: #059669;
+            }
+
+            body {
+                background: white;
+                font-size: 11pt;
+            }
+
+            body::before {
+                display: none;
+            }
+
+            .container {
+                max-width: 100%;
+                padding: 0;
+            }
+
+            .hero {
+                padding: 1rem 0;
+            }
+
+            .hero__badge { display: none; }
+
+            .hero__name {
+                font-size: 1.8rem;
+                -webkit-text-fill-color: var(--text-primary);
+                background: none;
+            }
+
+            .project-card,
+            .stat,
+            .skill-category,
+            .info-card {
+                break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #e2e8f0;
+            }
+
+            .project-card:hover,
+            .stat:hover,
+            .skill-category:hover,
+            .info-card:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            .project-card::before { display: none; }
+
+            .hero__link--primary {
+                background: var(--accent-primary);
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .project-card__tag {
+                border: 1px solid #cbd5e1;
+                background: #f1f5f9;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .footer {
+                margin-top: 1rem;
+                padding: 1rem 0 0;
+            }
+
+            @page {
+                margin: 1.5cm;
+                size: A4;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           RESPONSIVE
+           ═══════════════════════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 var(--space-md);
+            }
+
+            .hero {
+                padding: var(--space-2xl) 0 var(--space-xl);
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .project-card {
+                padding: var(--space-lg);
+            }
+
+            .project-card__header {
+                flex-direction: column;
+            }
+
+            .project-card__footer {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats {
+                grid-template-columns: 1fr 1fr;
+                gap: var(--space-sm);
+            }
+
+            .hero__links {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           TIMELINE INDICATOR
+           ═══════════════════════════════════════════════════════════ */
+        .timeline-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--text-tertiary);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--color-border);
+            font-family: var(--font-mono);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- ═══════════════ HERO ═══════════════ -->
+    <header class="hero">
+        <div class="hero__badge">
+            <span class="hero__badge-dot"></span>
+            Available for new opportunities
+        </div>
+        <h1 class="hero__name">
+            <span class="hero__name-gradient">Seyha Vorn</span>
+        </h1>
+        <p class="hero__title">Senior Software Engineer · Spring Boot · AI/LLM · Microservices · Vue.js & Angular</p>
+        <div class="hero__links">
+            <a href="https://seyhavorn-portfolio.vercel.app" target="_blank" class="hero__link hero__link--primary">
+                🌐 Portfolio
+            </a>
+            <a href="https://github.com/seyhavorn" target="_blank" class="hero__link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                GitHub
+            </a>
+            <a href="mailto:vornseyha4758@gmail.com" class="hero__link">
+                ✉️ Contact
+            </a>
+            <a href="https://www.linkedin.com/in/seyhavorn" target="_blank" class="hero__link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                LinkedIn
+            </a>
+        </div>
+    </header>
+
+    <!-- ═══════════════ STATS ═══════════════ -->
+    <div class="stats">
+        <div class="stat">
+            <div class="stat__value stat__value--purple">4+</div>
+            <div class="stat__label">Years Exp.</div>
+        </div>
+        <div class="stat">
+            <div class="stat__value stat__value--emerald">6</div>
+            <div class="stat__label">Projects</div>
+        </div>
+        <div class="stat">
+            <div class="stat__value stat__value--amber">15+</div>
+            <div class="stat__label">Technologies</div>
+        </div>
+        <div class="stat">
+            <div class="stat__value stat__value--cyan">3</div>
+            <div class="stat__label">Certifications</div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ FEATURED PROJECTS ═══════════════ -->
+    <section class="section">
+        <div class="section__header">
+            <div class="section__icon section__icon--purple">🚀</div>
+            <div>
+                <h2 class="section__title">Featured Projects</h2>
+                <p class="section__subtitle">Production systems I've architected and built</p>
+            </div>
+        </div>
+
+        <div class="projects-grid">
+            <!-- Project 1: CAS Weather Platform -->
+            <article class="project-card project-card--featured" style="--card-accent: var(--accent-primary);">
+                <div class="project-card__header">
+                    <div class="project-card__title-row">
+                        <div class="project-card__icon" style="background: rgba(99,102,241,0.12);">🌦️</div>
+                        <div class="project-card__meta">
+                            <h3 class="project-card__name">CAS Weather & Agricultural Platform</h3>
+                            <span class="project-card__role">Lead Engineer · Cambodia Agricultural Services</span>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:6px;">
+                        <span class="project-card__badge project-card__badge--featured">⭐ Featured</span>
+                        <span class="project-card__badge project-card__badge--production">● Live</span>
+                    </div>
+                </div>
+                <p class="project-card__description">
+                    A national-scale weather forecasting and agricultural intelligence platform serving Cambodia's farming communities.
+                    Features real-time weather data with 48-hour forecasts, early warning systems for floods, droughts, cyclones, 
+                    and pest alerts, with interactive GeoJSON-based maps and multi-language support.
+                </p>
+                <ul class="project-card__highlights">
+                    <li class="project-card__highlight">
+                        <span class="project-card__highlight-icon">▸</span>
+                        Built intelligent caching system achieving &lt;100ms load times with 95%+ cache hit rate
+                    </li>
+                    <li class="project-card__highlight">
+                        <span class="project-card__highlight-icon">▸</span>
+                        Designed real-time early warning dashboards for floods, droughts, cyclones & pest diseases
+                    </li>
+                    <li class="project-card__highlight">
+                        <span class="project-card__highlight-icon">▸</span>
+                        Implemented automated weather boundary data fetching with Node.js cron schedulers
+                    </li>
+                    <li class="project-card__highlight">
+                        <span class="project-card__highlight-icon">▸</span>
+                        Built embeddable iframe system for third-party integration of weather and warning data
+                    </li>
+                </ul>
+                <div class="project-card__footer">
+                    <div class="project-card__tags">
+                        <span class="project-card__tag">Vue 3</span>
+                        <span class="project-card__tag">TypeScript</span>
+                        <span class="project-card__tag">Vite</span>
+                        <span class="project-card__tag">Leaflet</span>
+                        <span class="project-card__tag">Pinia</span>
+                        <span class="project-card__tag">ApexCharts</span>
+                        <span class="project-card__tag">GeoJSON</span>
+                        <span class="project-card__tag">i18n</span>
+                    </div>
+                    <a href="https://cas.appchamka.com" target="_blank" class="project-card__link">
+                        View Live →
+                    </a>
+                </div>
+            </article>
+
+            <!-- Project 2: AI Knowledge Assistant -->
+            <article class="project-card" style="--card-accent: var(--accent-secondary);">
+                <div class="project-card__header">
+                    <div class="project-card__title-row">
+                        <div class="project-card__icon" style="background: rgba(167,139,250,0.12);">🤖</div>
+                        <div class="project-card__meta">
+                            <h3 class="project-card__name">AI Knowledge Assistant</h3>
+                            <span class="project-card__role">Senior Engineer · RAG Architecture</span>
+                        </div>
+                    </div>
+                    <span class="project-card__badge project-card__badge--production">● Production</span>
+                </div>
+                <p class="project-card__description">
+                    An intelligent Q&A platform powered by Retrieval-Augmented Generation (RAG). Integrates Spring AI 
+                    with Ollama and OpenAI to deliver context-aware responses with speech generation and image generation capabilities. 
+                    Uses MCP tool orchestration for multi-modal AI workflows.
+                </p>
+                <ul class="project-card__highlights">
+                    <li class="project-card__highlight">
+                        <span class="project-card__highlight-icon">▸</span>
+                        Designed RAG pipeline architecture with vector embeddings and semantic search
+                    </li>
+                    <li class="project-card__highlight">
+                        <span class="project-card__highlight-icon">▸</span>
+                        Integrated Spring AI with Ollama & OpenAI for multi-provider LLM support
+                    </li>
+                    <li class="project-card__highlight">
+                        <span class="project-card__highlight-icon">▸</span>
+                        Built speech generation (TTS) and image generation features
+                    </li>
+                    <li class="project-card__highlight">
+                        <span class="project-card__highlight-icon">▸</span>
+                        Implemented MCP tool orchestration for complex AI workflow automation
+                    </li>
+                </ul>
+                <div class="project-card__footer">
+                    <div class="project-card__tags">
+                        <span class="project-card__tag">Spring AI</span>
+                        <span class="project-card__tag">RAG</span>
+                        <span class="project-card__tag">Ollama</span>
+                        <span class="project-card__tag">OpenAI</span>
+                        <span class="project-card__tag">MCP</span>
+                        <span class="project-card__tag">Spring Boot</span>
+                        <span class="project-card__tag">PostgreSQL</span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Project 3: AgriMarket Data Nexus -->
+            <article class="project-card" style="--card-accent: var(--accent-emerald);">
+                <div class="project-card__header">
+                    <div class="project-card__title-row">
+                        <div class="project-card__icon" style="background: rgba(52,211,153,0.12);">📊</div>
+                        <div class="project-card__meta">
+                            <h3 class="project-card__name">AgriMarket Data Nexus</h3>
+                            <span class="project-card__role">Backend Engineer · Data Platform</span>
+                        </div>
+                    </div>
+                    <span class="project-card__badge project-card__badge--production">● Production</span>
+                </div>
+                <p class="project-card__description">
+                    A nationwide agricultural data synchronization platform built with Spring Batch for high-throughput data processing.
+                    Handles large-scale data ingestion from multiple sources with intelligent duplicate detection and reconciliation,
+                    serving real-time market data to agricultural stakeholders across Cambodia.
+                </p>
+                <ul class="project-card__highlights">
+                    <li class="project-card__highlight">
+                        <span class="project-card__highlight-icon">▸</span>
+                        Architected Spring Batch pipelines for nationwide agricultural data synchronization
+                    </li>
+                    <li class="project-card__highlight">
+                        <span class="project-card__highlight-icon">▸</span>
+                        Implemented intelligent duplicate detection and data reconciliation algorithms
+                    </li>
+                    <li class="project-card__highlight">
+                        <span class="project-card__highlight-icon">▸</span>
+                        Designed RESTful APIs and GraphQL endpoints for cross-department data access
+                    </li>
+                </ul>
+                <div class="project-card__footer">
+                    <div class="project-card__tags">
+                        <span class="project-card__tag">Spring Boot</span>
+                        <span class="project-card__tag">Spring Batch</span>
+                        <span class="project-card__tag">PostgreSQL</span>
+                        <span class="project-card__tag">GraphQL</span>
+                        <span class="project-card__tag">Redis</span>
+                        <span class="project-card__tag">Docker</span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Project 4: Climate Review Portal -->
+            <article class="project-card" style="--card-accent: var(--accent-cyan);">
+                <div class="project-card__header">
+                    <div class="project-card__title-row">
+                        <div class="project-card__icon" style="background: rgba(34,211,238,0.12);">🌍</div>
+                        <div class="project-card__meta">
+                            <h3 class="project-card__name">Climate Review Portal</h3>
+                            <span class="project-card__role">Full Stack Engineer · Dashboard</span>
+                        </div>
+                    </div>
+                    <span class="project-card__badge project-card__badge--production">● Production</span>
+                </div>
+                <p class="project-card__description">
+                    An interactive climate data visualization dashboard providing seasonal forecasts, climate parameter analysis,
+                    and historical trend comparisons. Features automated screenshot generation for reports using Puppeteer,
+                    with multiple model comparisons for seasonal forecasting.
+                </p>
+                <ul class="project-card__highlights">
+                    <li class="project-card__highlight">
+                        <span class="project-card__highlight-icon">▸</span>
+                        Built interactive Vue.js dashboard with climate parameter visualization
+                    </li>
+                    <li class="project-card__highlight">
+                        <span class="project-card__highlight-icon">▸</span>
+                        Automated report generation with Puppeteer screenshot pipelines
+                    </li>
+                    <li class="project-card__highlight">
+                        <span class="project-card__highlight-icon">▸</span>
+                        Integrated multiple seasonal forecast models with comparison views
+                    </li>
+                </ul>
+                <div class="project-card__footer">
+                    <div class="project-card__tags">
+                        <span class="project-card__tag">Vue.js</span>
+                        <span class="project-card__tag">Laravel</span>
+                        <span class="project-card__tag">Puppeteer</span>
+                        <span class="project-card__tag">ApexCharts</span>
+                        <span class="project-card__tag">Leaflet</span>
+                        <span class="project-card__tag">Chart.js</span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Project 5: Integration Services API -->
+            <article class="project-card" style="--card-accent: var(--accent-amber);">
+                <div class="project-card__header">
+                    <div class="project-card__title-row">
+                        <div class="project-card__icon" style="background: rgba(251,191,36,0.12);">🔗</div>
+                        <div class="project-card__meta">
+                            <h3 class="project-card__name">Integration Services API</h3>
+                            <span class="project-card__role">Backend Engineer · API Platform</span>
+                        </div>
+                    </div>
+                    <span class="project-card__badge project-card__badge--internal">● Internal</span>
+                </div>
+                <p class="project-card__description">
+                    A secure cross-department API gateway enabling data exchange between internal systems. Features 
+                    secret-header authentication, date-range filtering, and comprehensive logging. 
+                    Serves as the backbone for inter-departmental data communication with rate limiting and monitoring.
+                </p>
+                <ul class="project-card__highlights">
+                    <li class="project-card__highlight">
+                        <span class="project-card__highlight-icon">▸</span>
+                        Designed secret-header authentication for secure cross-department API access
+                    </li>
+                    <li class="project-card__highlight">
+                        <span class="project-card__highlight-icon">▸</span>
+                        Built date-range filtering and pagination for large dataset queries
+                    </li>
+                    <li class="project-card__highlight">
+                        <span class="project-card__highlight-icon">▸</span>
+                        Implemented comprehensive request logging and observability practices
+                    </li>
+                </ul>
+                <div class="project-card__footer">
+                    <div class="project-card__tags">
+                        <span class="project-card__tag">Spring Boot</span>
+                        <span class="project-card__tag">REST API</span>
+                        <span class="project-card__tag">PostgreSQL</span>
+                        <span class="project-card__tag">Redis</span>
+                        <span class="project-card__tag">Docker</span>
+                        <span class="project-card__tag">AWS</span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Project 6: Portfolio Website -->
+            <article class="project-card" style="--card-accent: var(--accent-rose);">
+                <div class="project-card__header">
+                    <div class="project-card__title-row">
+                        <div class="project-card__icon" style="background: rgba(244,114,182,0.12);">💼</div>
+                        <div class="project-card__meta">
+                            <h3 class="project-card__name">Personal Portfolio</h3>
+                            <span class="project-card__role">Solo Developer · Open Source</span>
+                        </div>
+                    </div>
+                    <span class="project-card__badge project-card__badge--production">● Live</span>
+                </div>
+                <p class="project-card__description">
+                    A modern, responsive portfolio website showcasing professional experience, career roadmap, 
+                    and technical projects. Built with Vue 3 and deployed on Vercel with dynamic animations, 
+                    dark theme, and optimized performance scores.
+                </p>
+                <ul class="project-card__highlights">
+                    <li class="project-card__highlight">
+                        <span class="project-card__highlight-icon">▸</span>
+                        Designed premium dark-themed UI with glassmorphism and micro-animations
+                    </li>
+                    <li class="project-card__highlight">
+                        <span class="project-card__highlight-icon">▸</span>
+                        Automated deployment with Vercel CI/CD and GitHub integration
+                    </li>
+                </ul>
+                <div class="project-card__footer">
+                    <div class="project-card__tags">
+                        <span class="project-card__tag">Vue 3</span>
+                        <span class="project-card__tag">TypeScript</span>
+                        <span class="project-card__tag">Vite</span>
+                        <span class="project-card__tag">Vercel</span>
+                        <span class="project-card__tag">CSS</span>
+                    </div>
+                    <a href="https://seyhavorn-portfolio.vercel.app" target="_blank" class="project-card__link">
+                        View Live →
+                    </a>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════ TECHNICAL SKILLS ═══════════════ -->
+    <section class="section">
+        <div class="section__header">
+            <div class="section__icon section__icon--emerald">⚡</div>
+            <div>
+                <h2 class="section__title">Technical Skills</h2>
+                <p class="section__subtitle">Core technologies and frameworks</p>
+            </div>
+        </div>
+
+        <div class="skills-grid">
+            <div class="skill-category">
+                <h3 class="skill-category__title">🖥️ Backend</h3>
+                <div class="skill-category__items">
+                    <span class="skill-pill">Spring Boot</span>
+                    <span class="skill-pill">Java</span>
+                    <span class="skill-pill">Laravel</span>
+                    <span class="skill-pill">PHP</span>
+                    <span class="skill-pill">NestJS</span>
+                    <span class="skill-pill">Node.js</span>
+                    <span class="skill-pill">GraphQL</span>
+                    <span class="skill-pill">REST APIs</span>
+                    <span class="skill-pill">Microservices</span>
+                </div>
+            </div>
+            <div class="skill-category">
+                <h3 class="skill-category__title">🎨 Frontend</h3>
+                <div class="skill-category__items">
+                    <span class="skill-pill">Vue.js</span>
+                    <span class="skill-pill">Angular</span>
+                    <span class="skill-pill">TypeScript</span>
+                    <span class="skill-pill">JavaScript</span>
+                    <span class="skill-pill">HTML/CSS</span>
+                    <span class="skill-pill">Sass</span>
+                    <span class="skill-pill">Bootstrap</span>
+                </div>
+            </div>
+            <div class="skill-category">
+                <h3 class="skill-category__title">🤖 AI & Data</h3>
+                <div class="skill-category__items">
+                    <span class="skill-pill">Spring AI</span>
+                    <span class="skill-pill">RAG</span>
+                    <span class="skill-pill">Ollama</span>
+                    <span class="skill-pill">OpenAI</span>
+                    <span class="skill-pill">MCP</span>
+                    <span class="skill-pill">Spring Batch</span>
+                </div>
+            </div>
+            <div class="skill-category">
+                <h3 class="skill-category__title">🗄️ Databases</h3>
+                <div class="skill-category__items">
+                    <span class="skill-pill">PostgreSQL</span>
+                    <span class="skill-pill">MySQL</span>
+                    <span class="skill-pill">Redis</span>
+                    <span class="skill-pill">Query Optimization</span>
+                </div>
+            </div>
+            <div class="skill-category">
+                <h3 class="skill-category__title">☁️ DevOps & Cloud</h3>
+                <div class="skill-category__items">
+                    <span class="skill-pill">Docker</span>
+                    <span class="skill-pill">Kubernetes</span>
+                    <span class="skill-pill">AWS</span>
+                    <span class="skill-pill">CI/CD</span>
+                    <span class="skill-pill">GitHub Actions</span>
+                    <span class="skill-pill">Ubuntu</span>
+                    <span class="skill-pill">Vercel</span>
+                </div>
+            </div>
+            <div class="skill-category">
+                <h3 class="skill-category__title">🧪 Testing & Tools</h3>
+                <div class="skill-category__items">
+                    <span class="skill-pill">JUnit</span>
+                    <span class="skill-pill">MockMvc</span>
+                    <span class="skill-pill">Git</span>
+                    <span class="skill-pill">Puppeteer</span>
+                    <span class="skill-pill">Agile/Scrum</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════ EDUCATION & CERTS ═══════════════ -->
+    <section class="section">
+        <div class="section__header">
+            <div class="section__icon section__icon--amber">🎓</div>
+            <div>
+                <h2 class="section__title">Education & Certifications</h2>
+                <p class="section__subtitle">Academic background and professional certifications</p>
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-card">
+                <div class="info-card__icon">🎓</div>
+                <div class="info-card__content">
+                    <div class="info-card__title">BSc Computer Science</div>
+                    <div class="info-card__subtitle">Royal University of Phnom Penh · 2018 – 2022</div>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="info-card__icon">☁️</div>
+                <div class="info-card__content">
+                    <div class="info-card__title">AWS Cloud Practitioner</div>
+                    <div class="info-card__subtitle">Amazon Web Services · 2024</div>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="info-card__icon">🌿</div>
+                <div class="info-card__content">
+                    <div class="info-card__title">Spring Professional</div>
+                    <div class="info-card__subtitle">VMware / Broadcom · 2024</div>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="info-card__icon">📦</div>
+                <div class="info-card__content">
+                    <div class="info-card__title">Docker Certified Associate</div>
+                    <div class="info-card__subtitle">Docker Inc. · 2023</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ FOOTER ═══════════════ -->
+    <footer class="footer">
+        <div class="footer__contact">
+            <span class="footer__contact-item">📍 Phnom Penh, Cambodia</span>
+            <span class="footer__contact-item">✉️ vornseyha4758@gmail.com</span>
+            <span class="footer__contact-item">🌐 seyhavorn-portfolio.vercel.app</span>
+        </div>
+        <p class="footer__text">
+            © 2026 Seyha Vorn · Project Portfolio · Last updated April 2026
+        </p>
+    </footer>
+</div>
+
+</body>
+</html>
