@@ -14,7 +14,7 @@
           SV
         </span>
         <span class="text-[15px] font-semibold text-white tracking-wide hidden sm:block">
-          Seyha<span class="text-teal-400">Vorn</span>
+          Seyha<span class="text-teal-400 ml-2">VORN</span>
         </span>
       </a>
 
