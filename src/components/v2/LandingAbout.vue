@@ -102,7 +102,7 @@ const education = cvData.education
 const languages = cvData.languages
 
 const totalSkills = new Set(
-  cvData.experiences.flatMap(e => e.jobs.flatMap(j => j.tags.map(t => t.name)))
+  cvData.experiences.flatMap(e => e.jobs.flatMap(j => 'tags' in j ? j.tags.map((t: any) => t.name) : (j as any).techStack ?? []))
 ).size
 
 const stats = [

@@ -75,6 +75,33 @@ const cvData = {
     summary: `Senior Full Stack Software Engineer with ${calcDuration(CAREER_START_YEAR, CAREER_START_MONTH)} of progressive experience. Expert in Spring Boot microservices, Laravel, and Angular/Vue.js ecosystems. Proven track record in AI integration (RAG, Spring AI, Ollama, OpenAI), cloud infrastructure (AWS, Docker, Kubernetes), and high-performance database optimization. Passionate about building scalable, intelligent systems and mentoring engineering teams.`,
   },
   experiences: [
+    // {
+    //   company: "BRONXs Technology Co., Ltd.",
+    //   totalDuration: calcDuration(CAREER_START_YEAR, CAREER_START_MONTH),
+    //   location: "Phnom Penh, Cambodia",
+    //   type: "Full-time",
+    //   jobs: [
+    //     {
+    //       title: "Senior Software Engineer",
+    //       period: formatPeriod(2025, 8), // Aug 2025 – Present (dynamic)
+    //       location: "Phnom Penh, Cambodia · On-site",
+    //       description: "Leading backend architecture and microservices design for core platform services. Driving AI integration using Spring AI, RAG pipelines, Ollama, and OpenAI. Owning server setup, domain configuration, and container orchestration on Ubuntu. Mentoring engineers, overseeing DB performance tuning, and establishing cross-team API contracts with observability practices.",
+    //       responsibilities: [
+    //         "Architect and implement scalable backend microservices using Spring Boot 3, Java 21, and Spring Cloud.",
+    //         "Integrate AI capabilities with RAG pipelines, leveraging Spring AI, Ollama, and OpenAI for intelligent data retrieval and automation.",
+    //         "Manage end-to-end deployment pipelines including server setup, domain configuration, Nginx reverse proxy, and Docker container orchestration.",
+    //         "Establish API contracts, implement observability with Prometheus/Grafana, and enforce coding standards across engineering teams.",
+    //         "Mentor mid-level and junior engineers, conduct code reviews, and drive technical excellence in system design and performance optimization.",
+    //       ],
+    //       achievements: [
+    //         "Successfully reduced API response times by 40% through query optimization and multi-tier caching strategies.",
+    //         "Led the integration of an AI-powered knowledge base, improving customer support response efficiency by 35%.",
+    //         "Architected a new microservices-based authentication system, enhancing security and scalability for enterprise clients.",
+    //       ],
+    //       techStack: ["Java 21", "Spring Boot", "Spring Cloud", "Spring AI", "Ollama", "OpenAI", "PostgreSQL", "Redis", "Docker", "Ubuntu", "Prometheus", "Grafana", "Nginx"],
+    //     },
+    //   ],
+    // },
     {
       company: "BRONX Technology Co., Ltd.",
       totalDuration: calcDuration(CAREER_START_YEAR, CAREER_START_MONTH),
