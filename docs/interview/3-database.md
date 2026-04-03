@@ -265,3 +265,152 @@ public User save(User user) { ... }
 **When to use which:**
 - **Master-Slave:** Most applications. Simple, well-understood. Scale reads easily.
 - **Multi-Master:** Geo-distributed apps requiring low-latency writes in multiple regions. Accept the complexity of conflict resolution.
+
+---
+
+### Q9. How do you handle geospatial data in PostgreSQL? Explain PostGIS.
+
+**PostGIS** is a PostgreSQL extension that adds support for geographic objects, spatial indexing, and geospatial functions.
+
+**Setting up:**
+```sql
+CREATE EXTENSION postgis;
+```
+
+**Spatial column types:**
+```sql
+CREATE TABLE weather_stations (
+    id          SERIAL PRIMARY KEY,
+    name        VARCHAR(100),
+    location    GEOMETRY(Point, 4326),       -- WGS 84 (GPS coordinates)
+    coverage    GEOMETRY(Polygon, 4326)       -- Station coverage area
+);
+
+-- Insert with latitude/longitude
+INSERT INTO weather_stations (name, location)
+VALUES ('Phnom Penh', ST_SetSRID(ST_MakePoint(104.9282, 11.5564), 4326));
+```
+
+**Common spatial queries:**
+
+```sql
+-- Find stations within 50km radius
+SELECT name, ST_Distance(
+    location::geography,
+    ST_SetSRID(ST_MakePoint(104.92, 11.55), 4326)::geography
+) AS distance_meters
+FROM weather_stations
+WHERE ST_DWithin(
+    location::geography,
+    ST_SetSRID(ST_MakePoint(104.92, 11.55), 4326)::geography,
+    50000  -- 50km in meters
+)
+ORDER BY distance_meters;
+
+-- Find stations within a province boundary (polygon)
+SELECT s.name
+FROM weather_stations s
+JOIN provinces p ON ST_Within(s.location, p.boundary)
+WHERE p.name = 'Battambang';
+
+-- Calculate area of a polygon (in square meters)
+SELECT name, ST_Area(boundary::geography) AS area_sq_m
+FROM provinces;
+```
+
+**Spatial indexing (critical for performance):**
+```sql
+CREATE INDEX idx_station_location ON weather_stations USING GIST (location);
+```
+
+**JPA integration with Hibernate Spatial:**
+```java
+@Entity
+public class WeatherStation {
+    @Column(columnDefinition = "geometry(Point, 4326)")
+    private Point location;  // org.locationtech.jts.geom.Point
+}
+
+// Repository with native spatial query
+@Query(value = "SELECT * FROM weather_stations WHERE ST_DWithin(location::geography, ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography, :radius)", nativeQuery = true)
+List<WeatherStation> findNearby(@Param("lon") double lon, @Param("lat") double lat, @Param("radius") double radius);
+```
+
+**Performance tips:**
+- Always use `ST_DWithin` (uses spatial index) instead of `WHERE ST_Distance(...) < N` (full table scan)
+- Cast to `::geography` for meter-based distance calculations (vs degree-based `::geometry`)
+- Use SRID 4326 (WGS 84) for stored GPS coordinates, transform to projected CRS for area calculations
+
+---
+
+### Q10. How does PostgreSQL table partitioning work? When should you use it?
+
+**Table partitioning** divides a large table into smaller, more manageable pieces called partitions. PostgreSQL supports it natively since version 10.
+
+**Partitioning strategies:**
+
+| Strategy | Partition By | Use Case |
+|----------|-------------|----------|
+| **Range** | Date ranges, numeric ranges | Time-series data (logs, weather, transactions) |
+| **List** | Discrete values | Data by region, category, tenant |
+| **Hash** | Hash of column value | Even distribution when no natural range |
+
+**Range partitioning for time-series data:**
+```sql
+-- Parent table (no data stored here directly)
+CREATE TABLE weather_observations (
+    id          BIGSERIAL,
+    station_id  VARCHAR(20) NOT NULL,
+    observed_at TIMESTAMPTZ NOT NULL,
+    temperature DECIMAL(5,2),
+    rainfall    DECIMAL(8,2),
+    location    GEOMETRY(Point, 4326),
+    PRIMARY KEY (id, observed_at)    -- partition key must be in PK
+) PARTITION BY RANGE (observed_at);
+
+-- Monthly partitions
+CREATE TABLE weather_obs_2026_01 PARTITION OF weather_observations
+    FOR VALUES FROM ('2026-01-01') TO ('2026-02-01');
+CREATE TABLE weather_obs_2026_02 PARTITION OF weather_observations
+    FOR VALUES FROM ('2026-02-01') TO ('2026-03-01');
+
+-- Default partition (catches data that doesn't match any partition)
+CREATE TABLE weather_obs_default PARTITION OF weather_observations DEFAULT;
+```
+
+**Automated partition management (Spring scheduled task):**
+```java
+@Scheduled(cron = "0 0 1 1 * *")  // 1st of every month
+@SchedulerLock(name = "partitionMaintenance")
+public void managePartitions() {
+    // Create next month's partition
+    LocalDate nextMonth = LocalDate.now().plusMonths(1);
+    String partName = "weather_obs_" + nextMonth.format(DateTimeFormatter.ofPattern("yyyy_MM"));
+    jdbcTemplate.execute("""
+        CREATE TABLE IF NOT EXISTS %s PARTITION OF weather_observations
+        FOR VALUES FROM ('%s') TO ('%s')
+        """.formatted(partName, nextMonth.withDayOfMonth(1), nextMonth.plusMonths(1).withDayOfMonth(1)));
+
+    // Drop partitions older than 2 years
+    LocalDate cutoff = LocalDate.now().minusYears(2);
+    String oldPart = "weather_obs_" + cutoff.format(DateTimeFormatter.ofPattern("yyyy_MM"));
+    jdbcTemplate.execute("DROP TABLE IF EXISTS " + oldPart);
+}
+```
+
+**Benefits:**
+- **Query performance:** Queries on `observed_at` skip irrelevant partitions (partition pruning)
+- **Maintenance:** `VACUUM` and `REINDEX` run per partition, not the whole table
+- **Data lifecycle:** Drop old partitions instantly (vs `DELETE` which is slow and bloats WAL)
+- **Parallel scans:** PostgreSQL can scan multiple partitions in parallel
+
+**When to partition:**
+- Table has 100M+ rows and growing
+- Queries almost always filter on the partition key (e.g., date range)
+- Old data needs periodic purging (drop partition vs slow DELETE)
+
+**When NOT to partition:**
+- Small tables (<10M rows) — overhead isn't worth it
+- Queries frequently span all partitions — no benefit from pruning
+- No natural partition key in your access patterns
+

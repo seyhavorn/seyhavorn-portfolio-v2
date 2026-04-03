@@ -255,3 +255,226 @@ resource "aws_ecs_service" "app" {
 
 **When to use Terraform:** Multi-cloud, team not exclusively on AWS, want to avoid vendor lock-in.
 **When to use CloudFormation:** All-in on AWS, want tighter AWS-native integration.
+
+---
+
+### Q9. How do you orchestrate a multi-service application with Docker Compose?
+
+**Docker Compose** defines and runs multi-container applications using a YAML file. It's ideal for local development, staging, and small-scale production with Docker.
+
+**Tiered Compose architecture (real-world pattern):**
+
+```
+docker-compose/
+├── docker-compose.infrastructure.yml   # PostgreSQL, Redis, Keycloak, RabbitMQ
+├── docker-compose.logging.yml          # Prometheus, Grafana, Loki, Tempo
+├── docker-compose.yml                  # All application microservices
+└── docker-compose.telegrambot.yml      # Notification bots
+```
+
+**Infrastructure layer:**
+```yaml
+# docker-compose.infrastructure.yml
+version: "3.8"
+services:
+  postgres:
+    image: postgis/postgis:15-3.3
+    environment:
+      POSTGRES_DB: cas_db
+      POSTGRES_USER: cas
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d  # Create extensions, schemas
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cas"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:21.0
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: cas
+      KC_DB_PASSWORD: ${DB_PASSWORD}
+    command: start-dev --import-realm
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+volumes:
+  postgres_data:
+```
+
+**Application layer with versioned images:**
+```yaml
+# docker-compose.yml
+version: "3.8"
+services:
+  discovery:
+    image: cas/discovery:${IMAGE_TAG:-latest}
+    ports:
+      - "6062:6062"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6062/actuator/health"]
+      interval: 15s
+
+  gateway:
+    image: cas/gateway:${IMAGE_TAG:-latest}
+    ports:
+      - "6063:6063"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:6062/eureka/
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:9091/realms/cas
+    depends_on:
+      discovery:
+        condition: service_healthy
+
+  weather-service:
+    image: cas/weather:${IMAGE_TAG:-latest}
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/cas_db
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:6062/eureka/
+    depends_on:
+      - discovery
+      - postgres
+```
+
+**Deployment command:**
+```bash
+# Deploy with specific version
+IMAGE_TAG=1.2.0 docker-compose -f docker-compose.infrastructure.yml up -d
+IMAGE_TAG=1.2.0 docker-compose up -d
+
+# Rolling update of a single service
+IMAGE_TAG=1.2.1 docker-compose up -d --no-deps weather-service
+
+# View logs across services
+docker-compose logs -f --tail=100 gateway weather-service
+```
+
+**Best practices:**
+- Split infra and app into separate compose files — infrastructure rarely changes
+- Use `healthcheck` + `depends_on: condition: service_healthy` for proper startup ordering
+- Pin image versions with `${IMAGE_TAG}` — never use `latest` in production
+- Use named volumes for data persistence across restarts
+- Set resource limits (`deploy.resources.limits`) to prevent one service from consuming all resources
+
+---
+
+### Q10. How do you build a shell-script deployment pipeline for Docker-based services?
+
+**Use case:** When you don't have CI/CD tools like GitHub Actions or Jenkins, shell scripts automate the build-tag-push-deploy lifecycle for multi-service applications.
+
+**Build script (build multiple services):**
+```bash
+#!/bin/bash
+# 01_build-images.sh
+VERSION=${1:-latest}
+SERVICES=${@:2}  # Optional: specific services to build
+
+# If no specific services, build all
+if [ -z "$SERVICES" ]; then
+    SERVICES=$(find . -maxdepth 1 -type d -name '[a-z]*' | sed 's|./||')
+fi
+
+for service in $SERVICES; do
+    echo "Building $service:$VERSION..."
+    cd "$service"
+
+    # Prefer Jib if pom.xml exists, otherwise Dockerfile
+    if [ -f "pom.xml" ]; then
+        mvn compile jib:dockerBuild -Dimage="cas/$service:$VERSION" -q
+    elif [ -f "Dockerfile" ]; then
+        docker build -t "cas/$service:$VERSION" .
+    fi
+
+    cd ..
+done
+
+echo "✅ All images built with tag: $VERSION"
+```
+
+**Save and transfer script:**
+```bash
+#!/bin/bash
+# 02_save-docker-images.sh
+VERSION=${1:-latest}
+MODE=${2:-individual}  # "individual" or "combined"
+SERVICES=${@:3}
+
+OUTPUT_DIR="./docker-images/$VERSION"
+mkdir -p "$OUTPUT_DIR"
+
+if [ "$MODE" = "combined" ]; then
+    # Save multiple images into single tar
+    IMAGES=$(echo "$SERVICES" | xargs -I{} echo "cas/{}:$VERSION")
+    docker save $IMAGES | gzip > "$OUTPUT_DIR/cas-services-$VERSION.tar.gz"
+else
+    # Save each image individually
+    for service in $SERVICES; do
+        docker save "cas/$service:$VERSION" | gzip > "$OUTPUT_DIR/$service-$VERSION.tar.gz"
+    done
+fi
+```
+
+**Deploy script (to remote server):**
+```bash
+#!/bin/bash
+# 03_deploy-docker-image.sh
+VERSION=$1
+SERVICE=$2
+CLEAN=${3:-""}  # "--clean" to remove old images
+
+SERVER="deploy@production-server"
+REMOTE_DIR="/opt/cas"
+
+# Transfer image
+scp "docker-images/$VERSION/$SERVICE-$VERSION.tar.gz" "$SERVER:$REMOTE_DIR/"
+
+# Load and run on remote server
+ssh "$SERVER" << EOF
+    cd $REMOTE_DIR
+    docker load < $SERVICE-$VERSION.tar.gz
+
+    # Remove dangling images if --clean flag
+    if [ "$CLEAN" = "--clean" ]; then
+        docker image prune -f
+    fi
+
+    # Restart the service with new image
+    IMAGE_TAG=$VERSION docker-compose up -d --no-deps $SERVICE
+
+    # Verify health
+    sleep 10
+    docker-compose ps $SERVICE
+    curl -sf http://localhost:6063/actuator/health || echo "⚠️ Health check failed"
+EOF
+```
+
+**When to use scripts vs CI/CD:**
+
+| Scenario | Scripts | CI/CD (GitHub Actions, Jenkins) |
+|----------|---------|-------------------------------|
+| Small team, few services | ✅ Simple, fast | Overkill |
+| No cloud infrastructure | ✅ Works on bare metal | Requires cloud/self-hosted runner |
+| Need approval workflows | ❌ Manual | ✅ Built-in approvals |
+| Audit trail required | ❌ No history | ✅ Full execution logs |
+| 10+ services, multiple envs | ❌ Script sprawl | ✅ Organized pipelines |
+
