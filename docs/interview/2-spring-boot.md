@@ -1,4 +1,4 @@
-# Senior Backend Interview — Spring Boot
+# Senior Backend Interview — Spring Boot (Banking/Fintech)
 
 ---
 
@@ -1865,5 +1865,290 @@ Banking App → Request auth for user → Keycloak sends push to user's phone
 | Admin impersonation | **Token Exchange** |
 | Banking / high-security | **CIBA** |
 
+---
 
+### Q37. What is gRPC and how does it compare to REST for inter-service communication?
 
+**REST (Representational State Transfer):**
+- Uses HTTP/1.1 (usually).
+- Payload is typically JSON (human-readable, but bulky).
+- Communication is primarily synchronous and unary (request-response).
+- Loosely coupled and easy to test with tools like Postman.
+
+**gRPC (gRPC Remote Procedure Calls):**
+- Built on HTTP/2 (supports multiplexing, server push, header compression).
+- Uses Protocol Buffers (Protobuf) as the interface definition language (IDL) and underlying message interchange format.
+- Payload is binary (highly serialized, smaller footprint, faster processing).
+- Supports 4 types of communication: Unary, Server streaming, Client streaming, and Bi-directional streaming.
+
+**When to choose which?**
+- **Use REST** for public-facing APIs, integration with third-party web apps, or when human-readability of payloads is needed for debugging.
+- **Use gRPC** for internal microservice-to-microservice communication where low latency, high throughput, and strict contracts (schema) are essential.
+
+---
+
+### Q38. How do you implement a gRPC server and client in Spring Boot?
+
+Spring Boot doesn't have native out-of-the-box auto-configuration for gRPC yet, but the widely used `grpc-spring-boot-starter` by `yidongnan` makes it seamless.
+
+**1. Define the Protobuf contract (`.proto` file):**
+```protobuf
+syntax = "proto3";
+option java_package = "com.example.grpc";
+option java_multiple_files = true;
+
+service GreetingService {
+  rpc sayHello (HelloRequest) returns (HelloReply);
+}
+
+message HelloRequest {
+  string name = 1;
+}
+
+message HelloReply {
+  string message = 1;
+}
+```
+
+**2. Implement the gRPC Server:**
+```java
+@GrpcService
+public class GreetingServiceImpl extends GreetingServiceGrpc.GreetingServiceImplBase {
+    @Override
+    public void sayHello(HelloRequest request, StreamObserver<HelloReply> responseObserver) {
+        String message = "Hello " + request.getName();
+        HelloReply reply = HelloReply.newBuilder().setMessage(message).build();
+        
+        responseObserver.onNext(reply);
+        responseObserver.onCompleted();
+    }
+}
+```
+
+**3. Implement the gRPC Client:**
+```java
+@Service
+public class GreetingClientService {
+    
+    @GrpcClient("greeting-service") // connects based on application.yml config
+    private GreetingServiceGrpc.GreetingServiceBlockingStub greetingStub;
+
+    public String receiveGreeting(String name) {
+        HelloRequest request = HelloRequest.newBuilder().setName(name).build();
+        HelloReply response = greetingStub.sayHello(request);
+        return response.getMessage();
+    }
+}
+```
+
+---
+
+### Q39. What is the Richardson Maturity Model in REST?
+
+The Richardson Maturity Model grades APIs on how strictly they adhere to REST principles.
+
+- **Level 0 (The Swamp of POX):** Uses HTTP only as a transport mechanism. Single URI and single HTTP method (mostly POST) for all operations. Example: SOAP or basic XML-RPC.
+- **Level 1 (Resources):** Introduces resources. Exposes multiple URIs, each representing a separate resource, rather than a single endpoint. Still mostly uses one HTTP method (often POST).
+- **Level 2 (HTTP Verbs):** Uses standard HTTP methods correctly (GET for reading, POST for creating, PUT/PATCH for updating, DELETE for removing). Uses HTTP status codes appropriately (200 OK, 201 Created, 204 No Content, 404 Not Found). This is where most modern APIs sit.
+- **Level 3 (Hypermedia Controls / HATEOAS):** The highest level. The API responses contain links to other related actions that can be performed, making the API self-discoverable. (Hypermedia As The Engine Of Application State).
+
+**Implementing Level 3 in Spring Boot:** Use Spring HATEOAS.
+```java
+@GetMapping("/users/{id}")
+public EntityModel<User> getUser(@PathVariable Long id) {
+    User user = userRepository.findById(id);
+    return EntityModel.of(user,
+        linkTo(methodOn(UserController.class).getUser(id)).withSelfRel(),
+        linkTo(methodOn(UserController.class).getAllUsers()).withRel("users"));
+}
+```
+
+---
+
+### Q40. How do you implement robust REST API versioning in Spring Boot?
+
+APIs evolve. Breaking changes (like dropping a column or changing a response structure) require versioning.
+
+**1. URI Versioning** (Most common, Twitter/GitHub do this):
+```java
+@GetMapping("/v1/users/{id}")
+public UserV1 getUserV1(@PathVariable Long id) { ... }
+
+@GetMapping("/v2/users/{id}")
+public UserV2 getUserV2(@PathVariable Long id) { ... }
+```
+- *Pro:* Easy to implement and test via browser.
+- *Con:* URI changes semantics.
+
+**2. Request Parameter Versioning** (Amazon does this):
+```java
+@GetMapping(value = "/users", params = "version=1")
+public UserV1 getUserV1() { ... }
+```
+- *Pro:* Simple to use.
+- *Con:* Clutters URLs.
+
+**3. Header Versioning** (Microsoft does this):
+```java
+@GetMapping(value = "/users", headers = "X-API-VERSION=1")
+public UserV1 getUserV1() { ... }
+```
+- *Pro:* Clean URIs.
+- *Con:* Harder to test in a browser without extensions.
+
+**4. Content Negotiation / Media Type Versioning** (GitHub also supports this):
+```java
+@GetMapping(value = "/users", produces = "application/vnd.company.app-v1+json")
+public UserV1 getUserV1() { ... }
+```
+- *Pro:* Semantically the most "RESTful" (Level 3 compliant).
+- *Con:* Complex to implement and test.
+
+**Best Practice:** Extract the core logic into services, and have different API controllers for different versions delegate to the underlying services while mapping to their respective DTOs.
+
+---
+
+### Q41. How do you prevent double-spending or handle idempotent requests in a payment API? (Common in Fintech)
+
+In financial systems, network failures or impatient users clicking "Pay" twice can cause duplicate transactions. An API is **idempotent** if making multiple identical requests has the same effect as making a single request.
+
+**Implementation Strategy:**
+1. **Idempotency Key (Header):** The client generates a unique UUID (e.g., `Idempotency-Key`) for the transaction.
+2. **Database Constraint:** Store the key in a database table (`idempotency_records`) with a `UNIQUE` constraint.
+3. **Redis Lock / Cache (Fast Reject):** Before hitting the DB, check if the key exists in Redis. If yes, immediately return the cached response of the original request.
+4. **Processing:**
+   - If key doesn't exist, acquire a distributed lock on the key.
+   - Process the payment.
+   - Save the result in the `idempotency_records` table and cache the response in Redis.
+   - Release the lock.
+
+**Spring Boot aspect:**
+```java
+@PostMapping("/pay")
+public ResponseEntity<?> processPayment(
+    @RequestHeader("Idempotency-Key") String idempotencyKey,
+    @RequestBody PaymentRequest request) {
+    
+    // 1. Check Redis for existing result
+    Optional<PaymentResponse> cached = idempotencyService.getResponse(idempotencyKey);
+    if (cached.isPresent()) return ResponseEntity.ok(cached.get());
+
+    // 2. Process within distributed lock
+    return lockService.executeWithLock(idempotencyKey, () -> {
+        PaymentResponse response = paymentStrategy.process(request);
+        idempotencyService.saveResponse(idempotencyKey, response);
+        return ResponseEntity.ok(response);
+    });
+}
+```
+
+---
+
+### Q42. How do you implement a distributed lock in Spring Boot?
+
+When multiple instances of a Spring Boot microservice need to coordinate access to a shared resource (like processing a specific user's wallet balance), standard Java `synchronized` blocks or `ReentrantLock` don't work because they only lock threads within the same JVM.
+
+**Solution: Redis with Redisson or ShedLock**
+
+**1. Redisson (For fine-grained, short-lived critical sections):**
+```java
+@Autowired
+private RedissonClient redissonClient;
+
+public void processWallet(Long userId, BigDecimal amount) {
+    RLock lock = redissonClient.getLock("wallet_lock:" + userId);
+    try {
+        // Try to acquire lock, wait up to 5s, auto-release after 10s
+        if (lock.tryLock(5, 10, TimeUnit.SECONDS)) {
+            // Read wallet balance, update, save
+        } else {
+            throw new ConcurrentUpdateException("Could not acquire lock, try again.");
+        }
+    } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+    } finally {
+        if (lock.isHeldByCurrentThread()) {
+            lock.unlock();
+        }
+    }
+}
+```
+
+**2. ShedLock (For scheduled batch jobs):**
+Ensures a `@Scheduled` task runs only on one instance of the app at a time.
+```java
+@Scheduled(cron = "0 0 * * * *")
+@SchedulerLock(name = "DailyReportGenerator", lockAtLeastFor = "15m", lockAtMostFor = "30m")
+public void generateDailyReport() {
+    // Only one instance in the cluster will execute this
+}
+```
+
+---
+
+### Q43. How do you trace a request spanning multiple microservices?
+
+When an error occurs in a microservice architecture, finding the root cause across 5 different services (API Gateway -> Service A -> Service B -> DB) is impossible without distributed tracing.
+
+**Key Concepts:**
+- **Trace ID:** A unique ID representing the entire request journey from start to finish.
+- **Span ID:** Represents a specific segment (e.g., Service A calling Service B). A single Trace ID contains multiple Span IDs.
+
+**Implementation (Spring Boot 3 / Micrometer Tracing):**
+1. Add dependencies: `micrometer-tracing-bridge-brave` or `otel`, and an exporter like `zipkin-reporter-brave`.
+2. Spring Boot automatically injects `traceparent` or `X-B3-TraceId` headers into outgoing requests (RestTemplate, WebClient, OpenFeign).
+3. Logs automatically append the Trace ID: `[service-a, traceId=abc1234, spanId=xyz5678]`.
+4. The tracing backend (Zipkin, Jaeger, or ELK Stack) aggregates the data to construct a visualization of the request flow and latency bottlenecks.
+
+---
+
+### Q44. How do you handle dead letter queues (DLQ) in Kafka/RabbitMQ within Spring Boot?
+
+Systems fail. APIs go down, databases timeout, and bad data is sent. If a consumer fails to process a message, it shouldn't crash or loop infinitely holding up the partition.
+
+**Strategy:**
+1. **Retries:** Configure immediate local retries (e.g., 3 times) for transient errors (like network blips).
+2. **Dead Letter Topic/Queue (DLQ):** If the message still fails after retries, publish it to a separate "Dead Letter Queue".
+3. **Alerting & Manual Intervention:** Trigger an alert (Slack/Email). An engineer inspects the DLQ, fixes the underlying issue or the data, and replays the messages back to the main queue.
+
+**Spring Kafka Example:**
+Use `SeekToCurrentErrorHandler` (Spring Boot 2) or `DefaultErrorHandler` (Spring Boot 3) coupled with a `DeadLetterPublishingRecoverer`.
+
+```java
+@Bean
+public DefaultErrorHandler errorHandler(KafkaTemplate<Object, Object> template) {
+    // Send to DLQ (original-topic.DLT) after 3 failures with a 1s backoff
+    DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(template);
+    FixedBackOff backOff = new FixedBackOff(1000L, 3L);
+    return new DefaultErrorHandler(recoverer, backOff);
+}
+
+@KafkaListener(topics = "orders")
+public void processOrder(Order order) {
+    // if this throws an exception 4 times, it goes to orders.DLT
+}
+```
+
+---
+
+### Q45. If your Spring Boot application suddenly becomes slow or consumes high CPU, how do you diagnose it?
+
+Senior developers are expected to troubleshoot production issues.
+
+**1. Immediate Diagnosis (Metrics & Telemetry):**
+- Check Grafana/Prometheus (JVM Memory, Thread Pool utilization, HikariCP connections, HTTP request latency).
+- Identify the bottleneck: Is it CPU, Heap Memory (Garbage Collection pauses), or threads stuck waiting on I/O (Database locks)?
+
+**2. High CPU Usage:**
+- Scenario: An infinite loop or incredibly inefficient algorithm.
+- Tool: Run `top -H -p <pid>` to find the thread using high CPU, then use `jstack <pid>` (Thread Dump) to see exactly what line of code that thread is executing.
+
+**3. Application Freezing / High Latency (Thread Exhaustion):**
+- Scenario: DB connection pool exhausted or external API is slow.
+- Tool: Take a Thread Dump (`jstack`). If you see dozens of threads in `WAITING` or `BLOCKED` states holding `java.sql.Connection` or inside `SocketInputStream.socketRead0()`, it means they are starving.
+- Fix: Add timeouts to RestTemplate/WebClient (`setReadTimeout`) and adjust the HikariCP `maximumPoolSize`.
+
+**4. OutOfMemoryError (OOM) / High Memory:**
+- Scenario: Memory leak (e.g., keeping objects in a static Map).
+- Tool: Obtain a Heap Dump (`jmap -dump:live,format=b,file=heap.hprof <pid>`) or ideally, configure the JVM to dump automatically on OOM (`-XX:+HeapDumpOnOutOfMemoryError`).
+- Analysis: Analyze the heap dump using Eclipse MAT (Memory Analyzer Tool) or VisualVM to find the "GCRoots" holding onto memory.

@@ -1,4 +1,4 @@
-# Senior Backend Interview — Data Structures & Algorithms (DSA)
+# Senior Backend Interview — Data Structures & Algorithms (Banking/Fintech)
 
 ---
 

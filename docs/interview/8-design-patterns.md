@@ -1,4 +1,4 @@
-# Senior Backend Interview — Design Patterns & Principles
+# Senior Backend Interview — Design Patterns & Principles (Banking/Fintech)
 
 ---
 

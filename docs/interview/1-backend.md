@@ -1,8 +1,8 @@
-# Senior Backend Interview — Backend Architecture & System Design
+# Senior Backend Interview — Backend Architecture & System Design (Banking/Fintech)
 
 ---
 
-### Q1. Explain the difference between monolithic and microservices architecture. When would you choose each?
+### Q1. Explain the difference between monolithic and microservices architecture. When would you choose each in a banking context?
 
 **Monolithic Architecture** packages all application components (UI, business logic, data access) into a single deployable unit.
 
@@ -17,69 +17,93 @@
 - Technology heterogeneity: each service can use the best tool for the job
 - Introduces complexity: distributed tracing, service discovery (Eureka, Consul), inter-service communication (REST, gRPC, messaging), and network latency
 
-**When to choose Monolith:**
-- Early-stage startup where speed of iteration matters
+**When to choose Monolith (banking context):**
+- Small fintech startup where speed of iteration matters
 - Small team (< 10 engineers)
-- Domain is not well understood yet — premature decomposition leads to wrong service boundaries
+- Single-product bank (e.g., just mobile wallet) where domain boundaries aren't clear yet
 
-**When to choose Microservices:**
-- Large teams where independent deployment cycles reduce bottlenecks
-- Different services have different scaling requirements
-- High availability and fault isolation are critical
+**When to choose Microservices (banking context):**
+- Core banking system with distinct domains: accounts, payments, loans, KYC, notifications
+- Different services have different scaling requirements (e.g., payment processing peaks during salary days)
+- Regulatory isolation: KYC/AML service can be audited independently from loan origination
+- Teams are organized by banking domain (accounts team, payments team, compliance team)
 
-> A senior answer acknowledges that microservices are not inherently better — they trade one set of problems for another.
+> A senior answer acknowledges that microservices are not inherently better — they trade one set of problems for another. In banking, the key driver is **regulatory isolation** and **independent deployability** for critical financial services.
 
 ---
 
-### Q2. How do you handle distributed transactions across multiple microservices?
+### Q2. How do you handle distributed transactions across multiple microservices? (Critical for banking)
 
-In a distributed system, traditional ACID transactions across services are impractical. The main approaches are:
+In a distributed banking system, a fund transfer may involve the Account Service (debit), Payment Service (transfer), and Notification Service (confirmation). Traditional ACID transactions across services are impractical.
 
 **Two-Phase Commit (2PC):**
 - Coordinator asks all participants to prepare, then commits or aborts
-- Rarely used in microservices — blocks resources, coordinator is a single point of failure, and network partitions can leave participants in an uncertain state
+- Rarely used in microservices — blocks resources, coordinator is a single point of failure
+- **Exception:** Some core banking platforms (e.g., Temenos T24) still use 2PC internally
 
-**Saga Pattern (preferred):**
-A saga is a sequence of local transactions, each publishing events or messages to trigger the next step. If a step fails, compensating transactions undo previous steps.
+**Saga Pattern (preferred for banking microservices):**
+A saga is a sequence of local transactions, each publishing events to trigger the next step. If a step fails, compensating transactions undo previous steps.
 
 - **Choreography-based Saga:** Services react to events. Decoupled, but harder to track the overall flow.
-- **Orchestration-based Saga:** A central orchestrator (e.g., using Temporal or a state machine) drives the saga steps. Easier to reason about and debug.
+- **Orchestration-based Saga:** A central orchestrator (e.g., using Temporal, Camunda, or a state machine) drives the saga steps. Easier to reason about and debug. **Preferred for banking** — you need a clear audit trail.
 
-**Eventual Consistency:**
-Accept that the system will be temporarily inconsistent and design compensating logic, idempotent consumers, and retry mechanisms accordingly.
+**Banking transfer saga example:**
+```
+1. Account Service: Debit $100 from Account A → publish "DEBIT_COMPLETED"
+2. Payment Service: Credit $100 to Account B → publish "CREDIT_COMPLETED"
+3. Notification Service: Send transfer confirmation → publish "NOTIFICATION_SENT"
 
-**Tools:** Axon Framework, Eventuate, Temporal, or custom Kafka-based sagas.
+If step 2 fails (insufficient funds on receiving bank):
+   Compensate step 1: Credit $100 back to Account A → publish "DEBIT_REVERSED"
+   Send failure notification to customer
+```
 
-> Strong answers include a real scenario, e.g., "In an order service, we used an orchestration saga: place order → reserve inventory → charge payment. If payment failed, we published a compensation event to release inventory."
+**Outbox Pattern (ensuring event-data consistency):**
+```java
+@Transactional
+public void transferFunds(TransferRequest req) {
+    // 1. Update account balance in SAME transaction
+    accountRepo.debit(req.fromAccount(), req.amount());
+    
+    // 2. Write event to outbox table in SAME transaction
+    outboxRepo.save(new OutboxEvent("TRANSFER_INITIATED", req));
+    // Debezium CDC publishes to Kafka after commit
+}
+```
+
+**Tools:** Temporal, Camunda (popular in banks), Axon Framework, or custom Kafka-based sagas.
+
+> **Banking interview insight:** Always mention the **Outbox Pattern** — it's the gold standard for ensuring transactional consistency between your database writes and your event publications. Banks cannot afford "phantom events" (events published but data not committed).
 
 ---
 
-### Q3. Describe your approach to API versioning in a large-scale system.
+### Q3. Describe your approach to API versioning in a banking system.
 
 **Common strategies:**
 
-1. **URI Versioning** — `/api/v1/users`, `/api/v2/users`
+1. **URI Versioning** — `/api/v1/accounts`, `/api/v2/accounts`
    - Simple, explicit, cache-friendly
-   - Breaks REST purity (version is not a resource attribute)
+   - **Preferred in banking** — clear, auditable, easy for compliance documentation
 
-2. **Header Versioning** — `Accept: application/vnd.myapp.v2+json`
+2. **Header Versioning** — `Accept: application/vnd.bank.v2+json`
    - Cleaner URLs, but harder to test in browsers
 
-3. **Query Parameter** — `/api/users?version=2`
+3. **Query Parameter** — `/api/accounts?version=2`
    - Easy but often messy and inconsistent
 
-**Best practices:**
-- Never break backward compatibility without a deprecation period (minimum 6 months)
-- Use consumer-driven contract testing (Pact) to validate compatibility between producer and consumer
+**Best practices for banking APIs:**
+- Never break backward compatibility without a **deprecation period (minimum 12 months for banking APIs)** — third-party integrators need time to adapt
+- Use consumer-driven contract testing (Pact) to validate compatibility
 - Document deprecations clearly with `Deprecation` and `Sunset` HTTP headers
-- Maintain at most 2 active major versions at a time
+- **Maintain at most 2 active major versions** at a time
 - Use OpenAPI/Swagger with version-specific specs
+- **Banking regulators may audit your API changelog** — maintain detailed records of all API changes
 
-> The key senior insight: versioning is a last resort. Prefer additive, backward-compatible changes (new optional fields) over introducing new versions.
+> The key senior insight: versioning is a last resort. Prefer additive, backward-compatible changes (new optional fields) over introducing new versions. In banking, API stability is paramount because downstream systems (mobile apps, ATMs, partner integrations) may not update frequently.
 
 ---
 
-### Q4. What is the CAP theorem and how does it impact your database and architecture decisions?
+### Q4. What is the CAP theorem and how does it impact database decisions in banking?
 
 **CAP Theorem** states that a distributed system can guarantee at most two of three properties simultaneously:
 
@@ -89,29 +113,37 @@ Accept that the system will be temporarily inconsistent and design compensating 
 
 **Key insight:** Network partitions are inevitable in distributed systems, so P is non-negotiable. The real choice is between **CP** and **AP**.
 
-| Database | CAP Position | Notes |
-|----------|-------------|-------|
-| PostgreSQL (single node) | CA | Partitions not expected |
-| Cassandra | AP | Tunable consistency levels |
-| MongoDB | CP (default) | Can be tuned toward AP |
-| ZooKeeper / etcd | CP | Used for coordination |
-| DynamoDB | AP | Eventual consistency by default |
+| Database | CAP Position | Banking Use Case |
+|----------|-------------|-----------------|
+| PostgreSQL (single node) | CA | Core banking, account balances |
+| Cassandra | AP | Transaction history, audit logs |
+| MongoDB | CP (default) | Document storage, loan applications |
+| Redis | AP | Session cache, rate limiting |
+| etcd / ZooKeeper | CP | Distributed locking, config coordination |
 
-**Practical impact:**
-- For financial transactions → CP (strong consistency, e.g., PostgreSQL with serializable isolation)
-- For user activity feeds, caches, analytics → AP (eventual consistency is acceptable)
-- Use CQRS + event sourcing to separate read (eventually consistent) and write (strongly consistent) models
+**Banking impact:**
+- For **account balances and transfers** → **CP is mandatory** (strong consistency, e.g., PostgreSQL with SERIALIZABLE isolation). You cannot show a customer a wrong balance.
+- For **transaction history views** → **AP is acceptable** (eventual consistency, replicated read views). A 2-second delay in showing a completed transfer is fine.
+- For **audit logs** → **CP** (every audit record must be durable and consistent)
+- For **rate limiting / session cache** → **AP** (fast, eventual consistency is acceptable)
+
+> **Banking interview insight:** Banks **always** choose CP for financial data. The correct answer is: "We never sacrifice consistency for availability when money is involved. We sacrifice availability — a customer seeing a 'please wait' message is infinitely better than seeing a wrong balance."
 
 ---
 
-### Q5. How would you design a rate-limiting system for a public API?
+### Q5. How would you design a rate-limiting system for a banking API?
+
+**Why rate limiting matters in banking:**
+- Prevent brute-force attacks on authentication endpoints
+- Protect against DDoS and abuse
+- Comply with **PCI DSS** — rate limiting is a security requirement
+- Prevent runaway API consumers from overwhelming the system
+- **Fraud detection** — excessive transaction attempts may indicate card testing
 
 **Algorithms:**
 
 - **Token Bucket:** A bucket holds N tokens. Each request consumes one token. Tokens refill at a fixed rate. Allows bursts up to bucket size.
-- **Leaky Bucket:** Requests are queued and processed at a fixed rate. Smooths out bursts.
-- **Fixed Window Counter:** Count requests per window (e.g., per minute). Simple but allows double the rate at window boundaries.
-- **Sliding Window Log / Counter:** More accurate, no boundary spikes. Slightly more memory-intensive.
+- **Sliding Window Counter:** More accurate, no boundary spikes.
 
 **Implementation with Redis:**
 ```java
@@ -122,75 +154,94 @@ if (count == 1) redisTemplate.expire(key, 1, TimeUnit.MINUTES);
 if (count > LIMIT) throw new RateLimitExceededException();
 ```
 
+**Banking-specific rate limits:**
+| Endpoint | Limit | Rationale |
+|----------|-------|-----------|
+| Login attempts | 5 per 15 min per user | Prevent brute-force |
+| Password reset | 3 per hour | Prevent account takeover |
+| Fund transfer | 100 per day per account | Fraud prevention |
+| Balance inquiry | 500 per hour | Prevent excessive polling |
+| KHQR generation | 50 per hour | Resource protection |
+| API key (partner) | 10,000 per hour | SLA management |
+
 **Design considerations:**
-- Rate limit per user, per API key, per IP, or per endpoint (different limits)
 - Return `429 Too Many Requests` with `Retry-After` header
 - Use a distributed counter (Redis) for multi-instance deployments
-- Implement soft limits with warnings before hard cutoff
-- Separate limits for authenticated vs anonymous users
-- Use API Gateway (Kong, AWS API Gateway) for centralized enforcement
+- **Log all rate limit violations** — they may indicate attacks (alert security team)
+- Different limits for authenticated vs anonymous users
+- **Exponential lockout** for login failures (5 min → 15 min → 1 hour)
 
 ---
 
-### Q6. Explain CQRS and Event Sourcing. When are they appropriate?
+### Q6. Explain CQRS and Event Sourcing. How are they used in banking?
 
 **CQRS (Command Query Responsibility Segregation):**
 Separates the write model (commands) from the read model (queries) into different models or even different databases.
 
 - **Write side:** Handles business logic, validation, and persistence. Optimized for consistency.
-- **Read side:** Serves denormalized views optimized for query performance. Often uses a different data store (e.g., Elasticsearch, Redis, or a read-optimized projection).
+- **Read side:** Serves denormalized views optimized for query performance.
 
 **Event Sourcing:**
 Instead of storing the *current state* of an entity, you store every *event* (state change) that happened to it, as an immutable append-only log.
 
 ```
-OrderCreated → ItemAdded → ItemAdded → PaymentReceived → OrderShipped
+AccountCreated → DepositReceived($500) → WithdrawalMade($200) → TransferSent($100)
+Current balance: $500 - $200 - $100 = $200
 ```
 
 To get the current state, you replay the events. Snapshots are used to avoid replaying from the beginning every time.
 
-**When to use:**
-- Systems requiring full audit trails (finance, healthcare, compliance)
-- Complex domains where replaying history is valuable (undo, reprocessing)
-- Systems with very different read/write patterns (high reads, low writes)
+**Why banking LOVES event sourcing:**
+- **Full audit trail** — every state change is recorded forever (NBC compliance)
+- **Regulatory reporting** — reconstruct any account state at any point in time
+- **Dispute resolution** — "What was the balance at 3:47 PM on March 15?" → replay events up to that timestamp
+- **Fraud investigation** — replay sequence of events to detect anomalies
+- **Interest calculation** — replay balance history to compute daily interest accurately
 
 **When NOT to use:**
 - Simple CRUD applications — massive over-engineering
 - Teams without experience in event-driven architectures
-- When eventual consistency between read and write models is not acceptable
+- When eventual consistency between read and write models is not acceptable for the specific use case
+
+> **Banking interview insight:** Event sourcing is a natural fit for banking because **regulators require full audit trails**. Many core banking systems (Temenos, Finastra) are built on event sourcing internally. Mention this to show domain awareness.
 
 ---
 
-### Q7. How would you design a notification system that handles millions of users?
+### Q7. How would you design a notification system for a banking application?
 
 **Architecture:**
 ```
-Event Source → Message Broker (Kafka) → Notification Service → Channel Adapters
-                                                              ├── Push (FCM/APNs)
-                                                              ├── Email (SES/SendGrid)
-                                                              ├── SMS (Twilio)
-                                                              └── In-App (WebSocket)
+Transaction Event → Message Broker (Kafka) → Notification Service → Channel Adapters
+                                                                   ├── Push (FCM/APNs)
+                                                                   ├── Email (SES/SendGrid)
+                                                                   ├── SMS (Twilio/local telco)
+                                                                   └── In-App (WebSocket)
 ```
 
-**Key design decisions:**
+**Banking-specific design decisions:**
 
 1. **Async processing:** Never send notifications synchronously. Publish events to Kafka; consumers process and route to appropriate channels.
 
-2. **User preferences:** Users subscribe to notification topics. Store preferences in a fast lookup (Redis). Check preferences before sending.
+2. **Regulatory notifications:** Some notifications are **mandatory by regulation** (e.g., transaction alerts for amounts > $100, suspicious activity alerts). These must have **guaranteed delivery** and **audit logging**.
 
-3. **Rate limiting per user:** Prevent notification fatigue — max N notifications per hour per user. Aggregate similar events.
+3. **User preferences:** Users subscribe to notification topics. Store preferences in Redis. **But regulatory notifications bypass user preferences** — you must send them regardless.
 
-4. **Template engine:** Notification content should be template-driven, not hardcoded. Support i18n.
+4. **Rate limiting per user:** Prevent notification fatigue — max N notifications per hour per user. Aggregate similar events (e.g., batch multiple small transactions into one summary).
 
-5. **Delivery guarantees:** Use at-least-once delivery with idempotency. Track notification IDs to prevent duplicates.
+5. **Template engine with i18n:** Support **Khmer and English** notification templates for Cambodian banks.
 
-6. **Retry and DLQ:** Transient failures (push service down) retry with exponential backoff. Permanent failures (invalid device token) go to Dead Letter Queue for cleanup.
+6. **Delivery guarantees:** Use at-least-once delivery with idempotency. Track notification IDs to prevent duplicates.
 
-7. **Priority levels:** Critical (security alerts) skip rate limits and use faster paths. Marketing notifications are low-priority and batched.
+7. **Priority levels:**
+   - **P0 (Critical):** Unauthorized transaction alerts, OTP codes → skip rate limits, fastest path
+   - **P1 (Important):** Transfer confirmations, payment receipts → standard processing
+   - **P2 (Informational):** Marketing promotions, account updates → batched, respect quiet hours
+
+8. **Retry and DLQ:** Transient failures retry with exponential backoff. Permanent failures go to Dead Letter Queue. **Alert compliance team if mandatory regulatory notifications fail to deliver.**
 
 ---
 
-### Q8. How do you handle graceful degradation and fault tolerance in a distributed system?
+### Q8. How do you handle graceful degradation and fault tolerance in a banking system?
 
 **Key patterns:**
 
@@ -198,95 +249,117 @@ Event Source → Message Broker (Kafka) → Notification Service → Channel Ada
 When a downstream service fails repeatedly, "trip" the circuit to fail-fast instead of waiting for timeouts. After a cooldown, allow test requests to check recovery.
 
 **Bulkhead Pattern:**
-Isolate resources per downstream service. If Service A is slow, it shouldn't consume all threads and starve calls to Service B. Use separate thread pools or semaphores.
+Isolate resources per downstream service. If the loan service is slow, it shouldn't consume all threads and starve the payment service.
 
 **Timeout + Retry with Backoff:**
 ```java
-@Retry(name = "paymentService", maxAttempts = 3)
-@TimeLimiter(name = "paymentService", timeoutDuration = "2s")
-@CircuitBreaker(name = "paymentService", fallbackMethod = "fallback")
-public CompletableFuture<PaymentResult> charge(PaymentRequest req) { ... }
+@Retry(name = "paymentGateway", maxAttempts = 3)
+@TimeLimiter(name = "paymentGateway", timeoutDuration = "2s")
+@CircuitBreaker(name = "paymentGateway", fallbackMethod = "fallback")
+public CompletableFuture<PaymentResult> processPayment(PaymentRequest req) { ... }
 ```
 
-**Fallback strategies:**
-- Return cached data (stale but available)
-- Return default/degraded response
-- Queue the operation for later processing
-- Show a user-friendly message instead of an error
+**Banking-specific fallback strategies:**
+- **Balance inquiry fails** → Return last cached balance with "As of [timestamp]" indicator
+- **Transfer to external bank fails** → Queue the transfer and notify customer "Transfer pending"
+- **KYC verification service down** → Block new account creation (never bypass compliance)
+- **Notification service down** → Queue notifications, never block the transaction itself
+- **Payment gateway down** → Return "Service temporarily unavailable, please try again"
 
-**Design principles:**
-- Design for failure — assume every external call can fail
-- Distinguish transient (retry) vs permanent (fail) errors
-- Health checks on all external dependencies
-- Chaos engineering — inject failures in staging to validate resilience
+**Design principles for banking:**
+- **Never silently fail on financial operations** — always inform the customer
+- **Never approximate financial data** — if you can't get accurate data, say so
+- **Compliance services must be fail-closed** — if KYC/AML check fails, block the transaction
+- **Non-critical services can be fail-open** — notifications, analytics can degrade gracefully
 
 ---
 
-### Q9. What is idempotency and why is it critical in backend systems? How do you implement it?
+### Q9. What is idempotency and why is it critical in banking? How do you implement it?
 
-**Idempotency** means performing the same operation multiple times produces the same result as performing it once. This is essential because network failures, retries, and message broker redeliveries can cause duplicate requests.
+**Idempotency** means performing the same operation multiple times produces the same result as performing it once. This is **the most critical concept in banking backend engineering**.
 
-**Why it matters:**
-- A user clicks "Pay" twice → should only be charged once
-- Kafka consumer crashes mid-processing and retries → should not create duplicate records
-- API Gateway retries a timed-out request → should not trigger the action again
+**Why it matters in banking:**
+- A customer clicks "Transfer $500" twice → should only transfer once
+- Mobile app retries after network timeout → should not create duplicate transfer
+- Kafka consumer crashes mid-processing and retries → should not credit account twice
+- **A single duplicate transaction means financial loss and regulatory scrutiny**
 
 **Implementation strategies:**
 
 **Strategy 1 — Idempotency Key (API level):**
 ```java
-@PostMapping("/payments")
-public ResponseEntity<Payment> createPayment(
+@PostMapping("/transfers")
+public ResponseEntity<TransferResult> initiateTransfer(
     @RequestHeader("Idempotency-Key") String idempotencyKey,
-    @RequestBody PaymentRequest request) {
+    @RequestBody TransferRequest request) {
 
     // Check if this key was already processed
-    Optional<Payment> existing = paymentRepo.findByIdempotencyKey(idempotencyKey);
+    Optional<TransferResult> existing = transferRepo.findByIdempotencyKey(idempotencyKey);
     if (existing.isPresent()) return ResponseEntity.ok(existing.get());
 
     // Process and store with the key
-    Payment payment = paymentService.process(request);
-    payment.setIdempotencyKey(idempotencyKey);
-    paymentRepo.save(payment);
-    return ResponseEntity.status(201).body(payment);
+    TransferResult result = transferService.execute(request);
+    result.setIdempotencyKey(idempotencyKey);
+    transferRepo.save(result);
+    return ResponseEntity.status(201).body(result);
 }
 ```
 
 **Strategy 2 — Database unique constraint:**
 ```sql
-CREATE UNIQUE INDEX idx_payments_idempotency ON payments(idempotency_key);
+CREATE UNIQUE INDEX idx_transfers_idempotency ON transfers(idempotency_key);
 ```
-Duplicate inserts throw a constraint violation → catch and return the existing record.
 
-**Strategy 3 — Deduplication table for event consumers:**
+**Strategy 3 — Redis fast-reject + DB fallback:**
 ```java
-// Kafka consumer
-public void handleOrderEvent(OrderEvent event) {
-    if (processedEventRepo.existsById(event.eventId())) return; // already processed
-    orderService.process(event);
-    processedEventRepo.save(new ProcessedEvent(event.eventId()));
+public TransferResult processTransfer(String idempotencyKey, TransferRequest req) {
+    // 1. Fast check in Redis
+    String cached = redis.get("idempotency:" + idempotencyKey);
+    if (cached != null) return deserialize(cached);
+
+    // 2. Acquire distributed lock
+    RLock lock = redisson.getLock("transfer-lock:" + idempotencyKey);
+    try {
+        if (lock.tryLock(5, 30, TimeUnit.SECONDS)) {
+            // 3. Double-check in database
+            Optional<TransferResult> existing = transferRepo.findByIdempotencyKey(idempotencyKey);
+            if (existing.isPresent()) return existing.get();
+
+            // 4. Process transfer
+            TransferResult result = executeTransfer(req);
+            
+            // 5. Cache in Redis + save in DB
+            redis.setex("idempotency:" + idempotencyKey, 86400, serialize(result));
+            return result;
+        }
+    } finally {
+        if (lock.isHeldByCurrentThread()) lock.unlock();
+    }
 }
 ```
 
 **HTTP methods and idempotency:**
-| Method | Idempotent? | Notes |
-|--------|------------|-------|
-| GET | Yes | Read-only, no side effects |
-| PUT | Yes | Full replacement — same payload, same result |
-| DELETE | Yes | Deleting an already-deleted resource is still "deleted" |
-| POST | **No** | Creates new resources — needs explicit idempotency key |
-| PATCH | Depends | Can be idempotent if designed carefully |
+| Method | Idempotent? | Banking Example |
+|--------|------------|-----------------|
+| GET | Yes | Get account balance |
+| PUT | Yes | Update customer profile (full replacement) |
+| DELETE | Yes | Deactivate account |
+| POST | **No** | Create transfer — **needs explicit idempotency key** |
+| PATCH | Depends | Update notification preferences |
+
+> **Banking interview must-answer:** When asked about idempotency, always mention the **triple-layer approach**: Redis fast-reject → distributed lock → database constraint. This shows you understand that idempotency at scale requires multiple defense layers.
 
 ---
 
-### Q10. Explain back-pressure. How do you handle it in a high-throughput system?
+### Q10. Explain back-pressure. How do you handle it in a high-throughput banking system?
 
-**Back-pressure** is a mechanism to slow down producers when consumers cannot keep up with the rate of incoming data. Without it, the system either crashes (OOM) or drops messages silently.
+**Back-pressure** is a mechanism to slow down producers when consumers cannot keep up. Without it, the system either crashes (OOM) or drops transactions — both unacceptable in banking.
 
-**Where back-pressure occurs:**
-- A Kafka consumer processes 100 msg/s but the producer pushes 10,000 msg/s → consumer lag grows infinitely
-- A REST API receives a traffic spike but the database can only handle 500 queries/s → connection pool exhausts
-- A microservice calls a downstream service that becomes slow → thread pool fills up
+**Where back-pressure occurs in banking:**
+- **Salary day surge:** All companies process payroll simultaneously → payment service overwhelmed
+- **Month-end reconciliation:** Batch processing generates millions of events
+- **Mobile app launch:** New feature rollout causes traffic spike
+- **Fraud detection service:** Checking every transaction becomes a bottleneck during peaks
 
 **Strategies:**
 
@@ -305,263 +378,250 @@ Reject excess traffic with `429 Too Many Requests` instead of letting it overwhe
 **3. Kafka consumer throttling:**
 - Control `max.poll.records` (batch size)
 - Use `pause()` and `resume()` on consumer when downstream is slow
-- Monitor consumer lag — scale consumers when lag increases
+- Monitor consumer lag — **scale consumers when lag increases**
 
-**4. Reactive streams (built-in back-pressure):**
+**4. Prioritized processing:**
 ```java
-// Project Reactor — subscriber controls demand
-Flux.range(1, 1_000_000)
-    .onBackpressureBuffer(1000)    // buffer up to 1000
-    .onBackpressureDrop(dropped -> log.warn("Dropped: {}", dropped))
-    .subscribe(item -> process(item));
+// In banking, not all transactions are equal
+if (transaction.getType() == TransactionType.INTERBANK_TRANSFER) {
+    highPriorityQueue.send(transaction);  // process immediately
+} else if (transaction.getType() == TransactionType.STATEMENT_GENERATION) {
+    lowPriorityQueue.send(transaction);   // can wait
+}
 ```
 
-**5. Load shedding:** When under extreme load, intentionally reject low-priority requests to preserve capacity for critical operations.
+**5. Load shedding:** Under extreme load, reject low-priority requests (marketing notifications, report generation) to preserve capacity for critical operations (transfers, balance inquiries).
 
-> Senior insight: The worst thing is *silent* back-pressure failure — data loss without any alert. Always monitor queue depths, consumer lag, and rejection counts.
+> **Banking insight:** The worst thing is *silent* data loss. In banking, you **never drop a financial transaction** — you queue it, slow it down, or reject it with a clear error. But you never silently lose it.
 
 ---
 
 ### Q11. What are the different data consistency patterns in distributed systems?
 
-| Pattern | Consistency | Performance | Use Case |
-|---------|------------|-------------|----------|
-| **Strong Consistency** | Every read returns the latest write | Slowest | Financial transactions, inventory |
-| **Eventual Consistency** | Reads may return stale data temporarily | Fastest | Social feeds, analytics, caches |
-| **Causal Consistency** | Related operations are seen in order | Moderate | Chat messages, comment threads |
-| **Read-your-writes** | A user always sees their own updates immediately | Moderate | User profile edits, shopping cart |
+| Pattern | Consistency | Performance | Banking Use Case |
+|---------|------------|-------------|-----------------|
+| **Strong Consistency** | Every read returns the latest write | Slowest | Account balances, transfer processing |
+| **Eventual Consistency** | Reads may return stale data temporarily | Fastest | Transaction history views, analytics |
+| **Causal Consistency** | Related operations are seen in order | Moderate | Chat support threads, audit logs |
+| **Read-your-writes** | A user always sees their own updates immediately | Moderate | After transfer: customer sees updated balance |
 
 **Strong Consistency techniques:**
 - Synchronous replication (all replicas acknowledge before responding)
 - Two-phase commit (distributed DB transactions)
 - Consensus protocols (Raft, Paxos)
 
-**Eventual Consistency techniques:**
-- Async replication, CDC (Change Data Capture)
-- Event-driven architecture with idempotent consumers
-- Conflict resolution: Last-Writer-Wins (LWW), CRDTs, or application-level merge logic
-
-**Read-your-writes pattern:**
+**Read-your-writes pattern (critical for banking UX):**
 ```java
-// After user updates their profile:
-// Option 1: Read from primary (not replica) for this user's session
+// After customer initiates a transfer:
+// Option 1: Read from primary (not replica) for this customer's session
 // Option 2: Cache the write locally and merge with DB reads
-// Option 3: Use a session-sticky load balancer to route to the same replica
+// Option 3: Use a session-sticky load balancer
 ```
 
-> Senior insight: Most systems need **mixed consistency** — strong for payments, eventual for activity feeds. Use the weakest consistency level that meets each business requirement.
+> **Banking insight:** Most banking systems need **mixed consistency** — strong for balances and transfers, eventual for transaction history and dashboards. Use the **strongest consistency level where money is involved**, and the weakest acceptable level everywhere else for performance.
 
 ---
 
-### Q12. What is a Service Mesh? When would you introduce one?
+### Q12. What is a Service Mesh? When would you introduce one in banking?
 
-**A Service Mesh** is an infrastructure layer that manages service-to-service communication. It handles networking concerns (retries, timeouts, mTLS, load balancing, observability) **outside** of your application code via sidecar proxies.
+**A Service Mesh** is an infrastructure layer that manages service-to-service communication via sidecar proxies.
 
-**Architecture:**
-```
-            ┌────────────────┐
-            │   Control Plane│  (Istiod / Linkerd control plane)
-            │  - Config      │  - Pushes routing rules to sidecars
-            │  - Certificates│  - Manages mTLS certificates
-            │  - Policies    │  - Collects telemetry
-            └───────┬────────┘
-                    │
-     ┌──────────────┼──────────────┐
-     │              │              │
-┌────▼────┐   ┌────▼────┐   ┌────▼────┐
-│ Sidecar │   │ Sidecar │   │ Sidecar │
-│ (Envoy) │   │ (Envoy) │   │ (Envoy) │
-│ ┌─────┐ │   │ ┌─────┐ │   │ ┌─────┐ │
-│ │Svc A│ │   │ │Svc B│ │   │ │Svc C│ │
-│ └─────┘ │   │ └─────┘ │   │ └─────┘ │
-└─────────┘   └─────────┘   └─────────┘
-```
-
-**What it provides (without changing app code):**
-- **mTLS:** Automatic mutual TLS between all services — zero-trust networking
+**What it provides:**
+- **mTLS:** Automatic mutual TLS between all services — zero-trust networking (PCI DSS requirement)
 - **Traffic management:** Canary deployments, A/B testing, traffic splitting
 - **Observability:** Automatic distributed tracing, metrics, access logs
-- **Resilience:** Retries, timeouts, circuit breakers at the infrastructure level
-- **Access control:** Fine-grained service-to-service authorization policies
+- **Access control:** Fine-grained service-to-service authorization
 
-**Popular implementations:** Istio (feature-rich, complex), Linkerd (lightweight, simpler), Consul Connect
+**Popular implementations:** Istio (feature-rich), Linkerd (lightweight), Consul Connect
 
-**When to introduce one:**
-- You have 20+ microservices and networking concerns are duplicated in every service
-- You need mTLS across all services without modifying each one
-- You want infrastructure-level observability and traffic control
-- Your team has Kubernetes expertise
+**When to introduce in banking:**
+- You have 20+ microservices and need consistent mTLS across all of them
+- **PCI DSS compliance** requires encrypted communication between all services
+- You need fine-grained authorization (e.g., only Payment Service can call Account Service's debit endpoint)
+- You want infrastructure-level observability without modifying each service
 
 **When NOT to:**
-- Less than 5-10 services — overkill and adds operational complexity
+- Less than 5-10 services — overkill
 - Team lacks Kubernetes expertise
-- Latency overhead of sidecar proxies is unacceptable (adds ~1-3ms per hop)
+- Latency overhead of sidecar proxies is unacceptable for real-time trading systems
 
 ---
 
-### Q13. How do you implement the Database-per-Service pattern in microservices?
+### Q13. How do you implement the Database-per-Service pattern in a banking system?
 
-**Principle:** Each microservice has its own private database that only it can access. Other services must go through the service's API. This ensures loose coupling, independent deployments, and technology freedom.
+**Principle:** Each microservice has its own private database. Other services must go through the service's API.
 
 ```
-[ Order Service ] → [ Orders DB (PostgreSQL) ]
-[ Product Service ] → [ Products DB (MongoDB) ]
-[ Search Service ] → [ Search Index (Elasticsearch) ]
-[ Session Service ] → [ Sessions (Redis) ]
+[ Account Service ] → [ Accounts DB (PostgreSQL) ]
+[ Payment Service ] → [ Payments DB (PostgreSQL) ]
+[ KYC Service ]     → [ KYC DB (PostgreSQL + Document Store) ]
+[ Notification Service ] → [ Notifications DB (PostgreSQL) + Redis ]
+[ Audit Service ]   → [ Audit DB (Cassandra - append-only) ]
 ```
 
-**Challenges and solutions:**
+**Banking-specific challenges and solutions:**
 
-**1. Cross-service queries (joins across databases):**
-- **API Composition:** An API Gateway or BFF (Backend-for-Frontend) calls multiple services and aggregates the results in memory.
-- **CQRS Read Model:** Maintain a denormalized read-only projection that combines data from multiple services via event consumption.
+**1. Cross-service queries (e.g., "Show customer's full financial profile"):**
+- **API Composition:** A BFF (Backend-for-Frontend) calls Account, Payment, Loan services and aggregates
+- **CQRS Read Model:** Maintain a denormalized read-only view that combines data via event consumption
 
-**2. Data consistency across services:**
-- Use the **Saga Pattern** with compensating transactions (see Q2).
-- **Outbox Pattern:** Write events to an `outbox` table in the same transaction as the business data. A separate process (Debezium CDC) publishes events to Kafka.
+**2. Data consistency across services (fund transfer):**
+- Use the **Saga Pattern** with compensating transactions
+- **Outbox Pattern:** Write events to an `outbox` table in the same transaction as the business data. Debezium CDC publishes events to Kafka.
 
-**3. Reporting and analytics:**
-- Don't query production microservice databases for reports.
-- Stream data changes (CDC) to a Data Warehouse (Snowflake, BigQuery) for analytics.
-- Use domain events to build materialized views optimized for reporting.
+**3. Regulatory reporting:**
+- Stream data changes (CDC) to a Data Warehouse for regulatory reports
+- **Never query production microservice databases for reports** — use dedicated reporting replicas
 
-**4. Data ownership disputes:**
-- Use Domain-Driven Design (DDD) bounded contexts to define clear data ownership.
-- If two services need the same data, one service is the "source of truth" and publishes events. The other consumes and keeps a local copy.
+**4. KYC data access:**
+- The KYC service is the single source of truth for customer identity
+- Other services get customer data via API calls, never direct DB access
+- This ensures **data privacy regulations** are enforced centrally
 
 ---
 
-### Q14. When would you use synchronous (REST/gRPC) vs asynchronous (Kafka/RabbitMQ) communication between services?
+### Q14. When would you use synchronous (REST/gRPC) vs asynchronous (Kafka/RabbitMQ) communication in banking?
 
 | Aspect | Synchronous (REST/gRPC) | Asynchronous (Message Broker) |
 |--------|------------------------|------------------------------|
 | **Coupling** | Tight — caller waits for response | Loose — fire and forget |
 | **Latency** | Low for simple calls | Higher (queue processing time) |
 | **Availability** | Both services must be up | Tolerates temporary downtime |
-| **Complexity** | Simple request-response | Needs broker, consumer logic, DLQ |
-| **Use when** | Need immediate response | Can process later, need fault tolerance |
+| **Use when** | Need immediate response | Can process later |
 
-**Use synchronous when:**
-- The caller needs an immediate answer (e.g., "Is this user authenticated?")
-- Simple request-response patterns (GET user by ID)
-- Low-latency requirements
-- Use gRPC over REST for internal service-to-service calls (binary protocol, schema enforcement, streaming)
+**Use synchronous when (banking examples):**
+- Balance inquiry → customer expects immediate answer
+- Authentication check → must respond before allowing access
+- Account validation → "Does this account exist?" before initiating transfer
+- Use **gRPC** for internal service-to-service calls (binary protocol, faster)
 
-**Use asynchronous when:**
-- The operation can be processed later (send email, generate report)
-- You need to decouple services (order placed → inventory reserved → payment charged)
-- Traffic is bursty and you need to smooth it out (message queue acts as a buffer)
-- You need guaranteed delivery even if the downstream service is temporarily down
+**Use asynchronous when (banking examples):**
+- Transaction notification → can be sent seconds later
+- Statement generation → background batch processing
+- Fraud scoring → async enrichment after transaction is recorded
+- Audit event publishing → must not block the transaction
 
-**Hybrid pattern (common in practice):**
+**Hybrid pattern (most common in banking):**
 ```
-User → [API Gateway] → [Order Service] (sync REST)
-                             │
-                             ▼ (async event to Kafka)
-                      [Inventory Service]
-                      [Notification Service]
-                      [Analytics Service]
+Customer → [API Gateway] → [Payment Service] (sync REST response: "Transfer initiated")
+                              │
+                              ▼ (async events to Kafka)
+                       [Account Service]      → Update balances
+                       [Notification Service] → Send SMS/push
+                       [Audit Service]        → Record event
+                       [Fraud Engine]         → Analyze pattern
 ```
-The user gets an immediate synchronous response ("Order placed"), while multiple downstream services process the event asynchronously.
 
 ---
 
-### Q15. How do you implement distributed locking? What are the risks?
+### Q15. How do you implement distributed locking? What are the risks? (Critical for banking)
 
-**Problem:** In a multi-instance deployment, two instances might process the same job simultaneously (e.g., scheduled task, payment processing, resource allocation).
+**Problem:** In a multi-instance banking deployment, two instances might process the same transfer simultaneously — resulting in double-debit or double-credit.
 
 **Solution 1 — Redis Distributed Lock (Redisson):**
 ```java
-RLock lock = redissonClient.getLock("process-payment:" + orderId);
-boolean acquired = lock.tryLock(5, 30, TimeUnit.SECONDS); // wait 5s, hold 30s
+RLock lock = redissonClient.getLock("account-lock:" + accountId);
+boolean acquired = lock.tryLock(5, 30, TimeUnit.SECONDS);
 try {
     if (acquired) {
-        paymentService.process(orderId);
+        // Read current balance
+        BigDecimal balance = accountRepo.getBalance(accountId);
+        // Validate sufficient funds
+        if (balance.compareTo(amount) < 0) throw new InsufficientFundsException();
+        // Debit
+        accountRepo.debit(accountId, amount);
     }
 } finally {
     if (acquired) lock.unlock();
 }
 ```
 
-**Solution 2 — Database advisory lock (PostgreSQL):**
+**Solution 2 — PostgreSQL advisory lock:**
 ```sql
-SELECT pg_try_advisory_lock(hashtext('process-payment-' || order_id));
+SELECT pg_try_advisory_lock(hashtext('account-' || account_id));
 -- do work
-SELECT pg_advisory_unlock(hashtext('process-payment-' || order_id));
+SELECT pg_advisory_unlock(hashtext('account-' || account_id));
 ```
 
-**Solution 3 — ZooKeeper / etcd:**
-- Consensus-based, strongest guarantees
-- Higher operational overhead
+**Solution 3 — Optimistic locking with @Version (for low-contention):**
+```java
+@Entity
+public class Account {
+    @Version
+    private Long version;  // JPA auto-increments on each update
+    
+    private BigDecimal balance;
+}
+// If two transactions read version=5 and both try to update,
+// only one succeeds. The other gets OptimisticLockException → retry.
+```
 
 **Risks and mitigations:**
-
 | Risk | Mitigation |
-|------|-----------|
+|------|-----------| 
 | **Lock holder crashes** | Always set a TTL/lease. Lock auto-expires after N seconds. |
-| **Clock skew** | Use Redlock algorithm (lock across multiple independent Redis instances) |
-| **Lock contention** | Design to minimize lock scope and duration. Lock per resource, not globally. |
-| **Deadlocks** | Always acquire locks in consistent order. Use timeouts. |
-| **Split-brain** | Use consensus-based systems (ZooKeeper/etcd) for critical locks |
+| **Clock skew** | Use Redlock algorithm (lock across multiple Redis instances) |
+| **Lock contention** | Lock per account, not globally. Keep lock scope minimal. |
+| **Deadlocks** | Always acquire locks in consistent order (sort account IDs). |
 
-> Senior insight: If you need distributed locks frequently, it may be a design smell. Consider redesigning with partitioning (each instance owns a subset of work) or idempotent operations instead.
+> **Banking interview insight:** If you need distributed locks frequently, consider redesigning. For account balance updates, **optimistic locking (@Version)** with retry is often simpler and sufficient for most banking operations. Reserve distributed locks (Redisson) for scenarios with high contention or external system coordination.
 
 ---
 
-### Q16. How would you design a multi-tenant SaaS backend?
+### Q16. How would you design a multi-tenant banking platform?
 
-**Multi-tenancy** allows a single application to serve multiple customers (tenants) while keeping their data isolated.
+**Multi-tenancy** allows a single platform to serve multiple banks or branches while keeping their data isolated.
 
-**Data isolation strategies:**
+**Data isolation strategies (banking context):**
 
-**1. Separate databases per tenant:**
+**1. Separate databases per tenant (bank):**
 ```
-Tenant A → database_tenant_a
-Tenant B → database_tenant_b
+Bank A → database_bank_a
+Bank B → database_bank_b
 ```
-- Strongest isolation. Easy compliance (GDPR data deletion = drop database).
-- Expensive — many database instances to manage. Hard to apply schema changes across all.
+- **Strongest isolation.** Required by some regulators.
+- Easy compliance — each bank's data is physically separate.
+- Expensive — many database instances to manage.
 
 **2. Shared database, separate schemas:**
 ```
-Tenant A → schema_tenant_a.users
-Tenant B → schema_tenant_b.users
+Bank A → schema_bank_a.accounts
+Bank B → schema_bank_b.accounts
 ```
 - Good isolation. Moderate cost.
 - Schema migrations must be applied to all schemas.
 
-**3. Shared database, shared schema (row-level isolation):**
+**3. Shared database, shared schema with row-level isolation:**
 ```sql
-SELECT * FROM users WHERE tenant_id = 'tenant_a';
+SELECT * FROM accounts WHERE bank_id = 'bank_a' AND customer_id = ?;
 ```
-- Cheapest. Easiest to manage. Most scalable.
-- Risk: forgetting `tenant_id` filter → data leak. Must enforce at the framework level.
+- Cheapest and most scalable.
+- **Risk:** Forgetting `bank_id` filter → data leak between banks. Critical in banking.
 
 **Enforcing tenant isolation in Spring Boot:**
 ```java
-// Hibernate filter — auto-applies tenant_id to all queries
-@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = String.class))
-@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
+@FilterDef(name = "bankFilter", parameters = @ParamDef(name = "bankId", type = String.class))
+@Filter(name = "bankFilter", condition = "bank_id = :bankId")
 @Entity
-public class Order {
-    @Column(name = "tenant_id")
-    private String tenantId;
+public class Account {
+    @Column(name = "bank_id")
+    private String bankId;
 }
 
-// Activate in a request filter
+// Activate in a request filter — EVERY query is automatically filtered
 Session session = entityManager.unwrap(Session.class);
-session.enableFilter("tenantFilter").setParameter("tenantId", currentTenantId());
+session.enableFilter("bankFilter").setParameter("bankId", currentBankId());
 ```
 
-**Other considerations:**
-- **Rate limiting per tenant** — prevent one tenant from consuming all resources
-- **Custom domains** — tenant-a.myapp.com, tenant-b.myapp.com
-- **Billing per tenant** — track resource usage (API calls, storage)
-- **Tenant-specific config** — feature flags, branding, custom workflows
+**Other banking-specific considerations:**
+- **Rate limiting per bank** — prevent one bank from consuming all resources
+- **Separate encryption keys per bank** — if one bank is compromised, others are safe
+- **Billing per bank** — track API calls, storage, transactions per tenant
+- **Compliance per bank** — different banks may have different regulatory requirements
 
 ---
 
-### Q17. How do you ensure backward compatibility when evolving APIs and data schemas?
+### Q17. How do you ensure backward compatibility when evolving banking APIs?
 
 **API backward compatibility rules:**
 
@@ -575,81 +635,60 @@ session.enableFilter("tenantFilter").setParameter("tenantId", currentTenantId())
 | Changing a field type (string → number) | ❌ No |
 | Making an optional field required | ❌ No |
 
-**Strategies for breaking changes:**
+**Banking-specific strategies:**
 
-**1. Tolerant Reader pattern:** Design consumers to ignore unknown fields. Use `@JsonIgnoreProperties(ignoreUnknown = true)` in Jackson.
+**1. Tolerant Reader pattern:**
+```java
+@JsonIgnoreProperties(ignoreUnknown = true)  // Ignore fields I don't know about
+public class TransferResponse { ... }
+```
 
 **2. Field deprecation over removal:**
 ```java
-public class UserResponse {
-    private String fullName;              // new field
+public class AccountResponse {
+    private String accountNumber;           // new field (IBAN format)
 
     @Deprecated
-    @JsonProperty("first_name")
-    private String firstName;             // keep for 2 releases, then remove
+    @JsonProperty("account_no")
+    private String accountNo;               // keep for 12+ months in banking
 }
 ```
 
-**3. Expand-Contract for database changes:**
-(See Spring Boot Q5 — never drop columns until old code is fully retired)
+**3. Consumer-Driven Contract Testing (Pact):**
+Mobile app team defines what they need from the API. Backend CI verifies all consumer contracts pass before deploying.
 
-**4. Consumer-Driven Contract Testing (Pact):**
-Consumers define the minimum response they need. Provider's CI verifies that all consumer contracts still pass before deploying.
-
-**5. Feature flags for gradual rollout:**
-```java
-if (featureFlags.isEnabled("new-pricing-model", tenantId)) {
-    return newPricingEngine.calculate(order);
-} else {
-    return legacyPricingEngine.calculate(order);
-}
-```
+**4. Change Advisory Board (banking-specific):**
+In banking, breaking API changes require formal approval from a Change Advisory Board (CAB). This is not just a technical decision — it involves compliance, operations, and business stakeholders.
 
 ---
 
-### Q18. Design a system for handling large file uploads (100MB–5GB).
+### Q18. Design a system for handling payment file processing (ISO 20022 / bulk payments).
 
-**Problem:** Large file uploads over a standard REST endpoint will time out, consume too much memory, or fail due to network instability.
+**Problem:** Banks receive bulk payment files (SWIFT MT, ISO 20022 XML) containing thousands of individual payment instructions that must be processed reliably.
 
-**Solution — Multipart/Chunked Upload to Object Storage:**
-
+**Architecture:**
 ```
-Client → [API Gateway] → [Upload Service] → [S3 / MinIO]
-                               │
-                               ▼ (async event)
-                         [Processing Service]
-                         (virus scan, resize, extract metadata)
-```
-
-**Step-by-step flow:**
-
-**1. Initiate upload — get a pre-signed URL:**
-```java
-@PostMapping("/uploads/initiate")
-public UploadSession initiateUpload(@RequestBody UploadRequest req) {
-    String uploadId = s3Client.createMultipartUpload(bucket, key);
-    return new UploadSession(uploadId, key, generatePresignedUrls(uploadId, req.parts()));
-}
-```
-
-**2. Client uploads chunks directly to S3:**
-- No data passes through your backend server → saves bandwidth and memory
-- Each chunk is 5-10MB. If a chunk fails, only retry that chunk.
-
-**3. Complete upload:**
-```java
-@PostMapping("/uploads/{uploadId}/complete")
-public FileMetadata completeUpload(@PathVariable String uploadId, @RequestBody List<PartETag> parts) {
-    s3Client.completeMultipartUpload(bucket, key, uploadId, parts);
-    kafkaTemplate.send("file-uploaded", new FileUploadedEvent(key)); // trigger processing
-    return new FileMetadata(key, size, contentType);
-}
+SFTP Upload → [File Ingestion Service] → Object Storage (S3)
+                    │
+                    ▼ (async event)
+            [File Parser Service]
+                    │
+                    ▼ (individual payment events to Kafka)
+            [Payment Processing Service]
+                    │
+                    ├─→ [Account Service] (debit/credit)
+                    ├─→ [Fraud Engine] (screening)
+                    ├─→ [Compliance Service] (sanctions check)
+                    └─→ [Notification Service] (confirmation)
+                    │
+                    ▼
+            [Reconciliation Service] (end-of-day matching)
 ```
 
 **Key design decisions:**
-- **Pre-signed URLs:** Client uploads directly to S3 — your server never handles the raw bytes
-- **Resumability:** Track which chunks were uploaded. Client can resume after a disconnect.
-- **Virus scanning:** Use ClamAV or AWS Guard Duty on the uploaded file before making it available
-- **Progress tracking:** Client reports chunk completion to your API. Store progress in Redis for real-time UI updates.
-- **Size limits:** Enforce per-tenant limits. Reject oversized files at initiation time.
-- **CDN:** Serve uploaded files via CloudFront/CDN for fast downloads.
+- **Idempotent processing:** Each payment instruction has a unique reference (UETR for SWIFT). Use as deduplication key.
+- **Transactional outbox:** Never publish payment events without first persisting the payment record.
+- **Status tracking:** Each payment goes through statuses: RECEIVED → VALIDATED → SCREENING → PROCESSING → COMPLETED/FAILED
+- **Reconciliation:** End-of-day batch job matches sent payments with received confirmations
+- **Audit trail:** Every status change is recorded with timestamp, user, and reason
+- **Error handling:** Failed payments go to manual review queue — never silently dropped

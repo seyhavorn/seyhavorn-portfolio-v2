@@ -1,17 +1,19 @@
-# Behavioral Interview Questions & HR Preparation
+# Behavioral Interview Questions & HR Preparation — Banking/Fintech
 
-A curated list of behavioral and HR interview questions with personalized answer scripts for Cambodian engineering interviews.
+A curated list of behavioral and HR interview questions with personalized answer scripts tailored for **Senior Backend Developer** positions at **Banks and Financial Institutions** in Cambodia.
 
 ---
 
-## 🇰🇭 Cambodia-Specific Context
+## 🇰🇭 Cambodia Banking Interview Context
 
-**Common in Cambodian Tech Interviews:**
-- **English proficiency** checks (technical communication)
-- Questions about **working in teams** and adapting to fast-paced startups
-- HR focuses on **cultural fit**, **salary expectations**, and **commitment**
-- Behavioral questions often follow the **STAR method** (Situation, Task, Action, Result)
-- Companies value **loyalty** and **willingness to learn** highly
+**Common in Cambodian Banking Tech Interviews:**
+- **English proficiency** checks (technical and business communication)
+- Questions about **regulatory compliance** (NBC regulations, PCI DSS awareness)
+- HR focuses on **trustworthiness**, **stability**, and **commitment** — banks value loyalty more than startups
+- Behavioral questions follow the **STAR method** (Situation, Task, Action, Result)
+- Banks test for **risk awareness** — they want developers who think about what could go wrong
+- **Background checks** are standard — be transparent about your history
+- **Confidentiality awareness** is expected — banks handle sensitive financial data
 
 ---
 
@@ -24,7 +26,7 @@ A curated list of behavioral and HR interview questions with personalized answer
 5. **Tell me about a time you failed. What did you learn?**
 6. **How do you handle conflict within a team?**
 7. **Describe a time you had to meet a tight deadline.**
-8. **Why do you want to work here?**
+8. **Why do you want to work at a bank / in fintech?**
 9. **Why are you leaving your current job?**
 10. **Where do you see yourself in 5 years?**
 11. **What motivates you?**
@@ -44,21 +46,21 @@ A curated list of behavioral and HR interview questions with personalized answer
 >
 > My most significant project was architecting a **12-service microservices platform** for Cambodia's Ministry of Agriculture, under the **FAO PEARL Project**. It's an agrometeorological early-warning system that processes real-time climate data from NOAA and ECMWF, runs it through domain-specific risk engines — flood, drought, cyclone, pest & disease — and delivers advisory bulletins and push notifications to farming communities across Cambodia. I designed the full architecture using **Spring Cloud** — Eureka for service discovery, Spring Cloud Gateway, Resilience4j for circuit breaking, RabbitMQ for event-driven notifications, and **PostGIS** for geospatial processing.
 >
-> Beyond that, I've built enterprise-grade systems including a **CRM platform**, **multi-tenant CMS**, and an **SMS gateway service** — all using Java 21 and Spring Boot with PostgreSQL, Redis, and Liquibase for database migrations.
+> Beyond that, I've built enterprise-grade systems including a **CRM platform**, **multi-tenant CMS**, and an **SMS gateway service** — all using Java 21 and Spring Boot with PostgreSQL, Redis, and Liquibase for database migrations. These systems handle **data consistency, concurrent processing, and transaction integrity** — concerns that directly align with banking backend challenges.
 >
-> What sets me apart is that I own the **full deployment lifecycle** — not just writing code. I containerize applications with **Docker and Jib**, orchestrate with **Docker Compose**, manage **CI/CD pipelines**, and administer **Ubuntu production servers** and **AWS infrastructure**. I've also integrated **AI/LLM capabilities** using Spring AI and RAG pipelines.
+> What sets me apart is that I own the **full deployment lifecycle** — not just writing code. I containerize applications with **Docker and Jib**, orchestrate with **Docker Compose**, manage **CI/CD pipelines**, and administer **Ubuntu production servers** and **AWS infrastructure**. I've also implemented **idempotent payment-style APIs, distributed locking with Redis, and event-driven architectures** with exactly-once processing guarantees.
 >
-> I'm now looking to bring this experience to a team where I can tackle more complex distributed systems challenges and continue growing as an engineer. That's what excited me about this opportunity — [*tailor to the company*]."
+> I'm now looking to bring this experience to banking — where **data integrity, security, and system reliability** are non-negotiable. The financial domain excites me because every line of code has real consequences for people's money and trust."
 
 **A (Short Version — 1 minute):**
 
-> "I'm Seyha, a backend engineer with 4 years of experience in Java and Spring Boot. I've architected a 12-microservice platform for Cambodia's Ministry of Agriculture that processes real-time climate data and delivers early-warning alerts to farming communities. I've also built enterprise CRM and multi-tenant CMS platforms. I handle the full stack from code to deployment — Docker, CI/CD, and server administration. I'm looking for a role where I can tackle larger-scale distributed systems challenges."
+> "I'm Seyha, a backend engineer with 4 years of experience in Java and Spring Boot. I've architected a 12-microservice platform that processes real-time data with high reliability requirements — including distributed transactions, idempotent APIs, and event-driven processing. I've also built enterprise CRM and multi-tenant platforms. I handle the full stack from code to deployment — Docker, CI/CD, and server administration. I'm looking to apply these skills in banking where data integrity and system reliability are critical."
 
-**Tips for customizing:**
-- **Swap the last sentence** to mention something specific about the company you're interviewing with
-- **Adjust emphasis** based on the job description — if they want DevOps skills, expand on Docker/K8s; if they want architecture, expand on the 12-service design
-- **Practice out loud** — aim for natural delivery, not memorized recitation
-- **Don't rush** — pausing between key points makes you sound confident
+**Tips for banking interviews:**
+- **Emphasize reliability and data integrity** — banks want engineers who think about what happens when things fail
+- **Mention security awareness** — even if it wasn't your primary focus, show you understand it matters
+- **Show you understand the domain** — terms like "transaction consistency", "audit trails", "idempotency" resonate with banking interviewers
+- **Don't rush** — pausing between key points makes you sound confident and thoughtful
 
 ---
 
@@ -66,43 +68,45 @@ A curated list of behavioral and HR interview questions with personalized answer
 
 > "Three reasons:
 >
-> **First, I deliver production-ready systems, not just code.** I've architected and shipped a 12-microservice platform that's actively used by Cambodia's Ministry of Agriculture — processing real-time climate data, running risk engines, and sending alerts to thousands of users. That's not a side project — it's a live, mission-critical system I built end-to-end.
+> **First, I build systems where data integrity is non-negotiable.** I've architected a 12-microservice platform that processes real-time data with zero tolerance for data loss. I implemented distributed locking, idempotent APIs, and saga patterns for cross-service consistency — the same patterns used in core banking systems. That's not textbook knowledge — it's production experience.
 >
-> **Second, I own the full lifecycle.** Most backend developers hand off deployment to someone else. I containerize with Docker, set up CI/CD pipelines, manage production servers, and monitor with Prometheus and Grafana. When something breaks at 2 AM, I can debug from the application layer all the way down to the infrastructure.
+> **Second, I own the full lifecycle — code to production.** Most backend developers hand off deployment to someone else. I containerize with Docker, set up CI/CD pipelines, manage production servers, and monitor with Prometheus and Grafana. When something breaks at 2 AM, I can debug from the application layer all the way down to the infrastructure. In banking, where uptime is everything, that full-stack ownership is critical.
 >
-> **Third, I bring breadth across domains.** I've built a CRM, a multi-tenant CMS, an SMS gateway, and an AI-powered RAG pipeline — each with different architectural challenges. That means I can ramp up fast on whatever your team is building, because I've likely solved a similar problem before.
+> **Third, I understand that banking code has consequences.** A bug in a social media app means a broken feed. A bug in banking means someone's money disappears. I've built systems where every transaction is auditable, every state change is recorded, and every failure has a recovery path. That mindset — engineering for trust — is what I'd bring to your team.
 >
-> I'm not just looking for a job — I'm looking for a team where I can make a real engineering impact. And from what I've seen, [*company name*] is exactly that kind of place."
+> I'm not just looking for a job — I'm looking for a team where engineering rigor directly impacts people's financial lives. And from what I've seen, [*bank name*] is exactly that kind of place."
 
-*Tip: Structure as 3 clear points. Each point = claim + proof. End by connecting to the company.*
+*Tip: structure as 3 clear points. Each point = claim + proof. End by connecting to the bank's mission.*
 
 ---
 
 ### Q3. What's your greatest strength?
 
-> "My greatest strength is **problem-solving under pressure**. For example, when our production database went down during a peak hour, I calmly identified the bottleneck, implemented a temporary fix within 30 minutes, and then worked with the team on a permanent solution. We reduced downtime by 70% compared to previous incidents."
+> "My greatest strength is **designing systems that don't fail silently**. For example, when building our event-driven notification system, I didn't just implement the happy path — I added dead letter queues for failed messages, idempotency keys to prevent duplicate processing, and circuit breakers for external service calls. When our SMS provider went down for 2 hours, the system automatically queued all messages and delivered them in order once the service recovered. Zero data loss.
+>
+> In banking, I think this mindset is essential — you need engineers who think about failure scenarios before they write the first line of code."
 
-*Tip: Pick a strength relevant to the job. Back it with a specific example.*
+*Tip: Pick a strength relevant to banking — reliability, security thinking, attention to detail.*
 
 ---
 
 ### Q4. What's your greatest weakness?
 
-> "I used to struggle with **delegating tasks** because I wanted to ensure everything was perfect. However, I've learned that trusting my teammates and providing clear guidance leads to better outcomes for everyone. I've been actively working on this by taking on more collaborative projects and focusing on code reviews instead of doing everything myself."
+> "I used to struggle with **delegating tasks** because I wanted to ensure everything was done to a high standard — especially around data consistency and error handling. However, I've learned that trusting my teammates and providing clear guidelines and code review standards leads to better outcomes for everyone. I've been actively working on this by writing comprehensive coding standards, setting up automated quality gates in CI/CD, and focusing on mentoring rather than doing everything myself."
 
-*Tip: Show self-awareness and improvement. Never say "I work too hard" or "I'm a perfectionist" — those sound rehearsed.*
+*Tip: Show self-awareness and improvement. In banking, perfectionism around data integrity can be reframed as a strength.*
 
 ---
 
 ### Q5. Describe a challenging project you worked on.
 
-> "The most challenging project was the **ADS-CAS agrometeorological platform**. The challenge was building a system that ingests climate data from multiple external sources — NOAA, ECMWF, local weather stations — in different formats (NetCDF, XML, CSV), processes it through scientific risk models, and delivers actionable alerts to farmers in near real-time.
+> "The most challenging project was the **ADS-CAS agrometeorological platform**. The challenge was building a system that ingests data from multiple external sources — NOAA, ECMWF, local weather stations — in different formats (NetCDF, XML, CSV), processes it through scientific risk models, and delivers actionable alerts in near real-time. The parallels to banking are strong — we had to handle **unreliable external data sources, ensure processing exactly-once semantics, and maintain audit trails** for every data transformation.
 >
-> I broke it down: first, I designed the microservice boundaries using domain-driven design. Then I implemented Spring Batch ETL pipelines for data ingestion, PostGIS for geospatial processing, and RabbitMQ for async notification delivery. The hardest part was making the system reliable — I added ShedLock for distributed scheduling, circuit breakers for external API calls, and table partitioning for time-series data.
+> I broke it down: first, I designed the microservice boundaries using domain-driven design. Then I implemented Spring Batch ETL pipelines for data ingestion, PostGIS for geospatial processing, and RabbitMQ for async notification delivery. The hardest part was making the system reliable — I added **ShedLock for distributed scheduling** (so only one instance processes each batch), **circuit breakers for external API calls**, **idempotent consumers** (deduplication via event IDs), and **table partitioning** for time-series data.
 >
-> The result: the platform now processes thousands of data points every 2 hours and sends automated alerts to agricultural communities across Cambodia."
+> The result: the platform now processes thousands of data points every 2 hours with **zero duplicate records and full auditability** — the same guarantees a banking transaction system needs."
 
-*Tip: Use STAR method — Situation, Task, Action, Result. Be specific about what YOU did.*
+*Tip: Frame your experience in banking terms — data integrity, exactly-once processing, audit trails.*
 
 ---
 
@@ -110,11 +114,11 @@ A curated list of behavioral and HR interview questions with personalized answer
 
 > "Early in my career, I deployed a database migration to production without testing it against a full dataset. The migration worked on dev with 100 rows but timed out on production with 2 million rows — causing 45 minutes of downtime.
 >
-> What I learned: I now always test migrations against production-sized data, use expand-contract migration patterns, and never deploy schema changes during peak hours. I also set up a staging environment with production data snapshots specifically for migration testing.
+> What I learned: I now always test migrations against production-sized data, use **expand-contract migration patterns** (add column first, migrate data, then drop old column — never in the same release), and never deploy schema changes during peak hours. I also set up a staging environment with production data snapshots specifically for migration testing.
 >
-> That failure made me much more disciplined about deployment practices."
+> In banking, this kind of mistake could mean account data becomes inaccessible during business hours. That failure taught me that **every database change in production must be reversible**, and I've followed that principle religiously ever since."
 
-*Tip: Pick a real failure, not a humble-brag. Show the lesson and how you changed.*
+*Tip: Pick a real failure, show the lesson, and connect to why it matters in banking.*
 
 ---
 
@@ -122,41 +126,35 @@ A curated list of behavioral and HR interview questions with personalized answer
 
 > "I focus on the **problem, not the person**. In a recent project, a colleague and I disagreed on whether to use REST or gRPC for inter-service communication. Instead of arguing, I suggested we both write a short pros/cons document and discuss with the team.
 >
-> After comparing, we agreed that REST was better for our use case because we needed browser compatibility. The key was making it a technical discussion backed by evidence, not a personal debate.
+> After comparing, we agreed that REST was better for our use case because we needed browser compatibility and easier debugging. The key was making it a technical discussion backed by evidence, not a personal debate.
 >
-> I've found that most conflicts come from miscommunication. So I always try to understand the other person's perspective first before pushing my own."
+> In banking, I think this approach is especially important because **architectural decisions have long-term financial implications**. You want decisions based on data, not ego. I've found that most conflicts come from miscommunication, so I always try to understand the other person's perspective first."
 
-*Tip: Show maturity. Never badmouth former colleagues or managers.*
+*Tip: Show maturity and data-driven decision-making — banks value measured, thoughtful engineers.*
 
 ---
 
-### Q8. Describe a time you had to meet a tight deadline.
+### Q8. Why do you want to work at a bank / in fintech?
 
-> "We had 3 weeks to deliver an SMS gateway service for a client launch. I broke the work into daily milestones, prioritized the critical path — API endpoint, message queue integration, delivery status tracking — and deferred nice-to-haves like the admin dashboard.
+> "Three reasons:
 >
-> I communicated daily progress to stakeholders so there were no surprises. When I hit a blocking issue with the telco API, I escalated immediately and we found a workaround within a day.
+> **First, the technical challenges are real and consequential.** Banking systems handle people's money — there's zero tolerance for bugs that cause incorrect balances, duplicate transfers, or security breaches. That level of engineering rigor excites me.
 >
-> We delivered on time. The dashboard followed one week later. The client was happy because the core functionality worked perfectly from day one."
+> **Second, I've already built systems with banking-grade requirements.** My microservices platform processes real-time data with distributed transactions, idempotent APIs, and full audit trails. I want to apply those skills in a domain where they matter most.
+>
+> **Third, banking technology in Cambodia is evolving rapidly.** With KHQR, mobile banking, and NBC's digital transformation initiatives, there's an opportunity to build systems that serve millions of people. I want to be part of that — building infrastructure that Cambodians trust with their financial lives.
+>
+> \[*For specific bank*\]: I'm particularly interested in [*bank name*] because [*mention their specific tech initiative, mobile app, or digital banking platform*]."
 
-*Tip: Show planning, prioritization, and communication — not just heroic overtime.*
+*Tip: ALWAYS research the bank before the interview. Mention their specific products (mobile banking app, digital payments platform, KHQR adoption).*
 
 ---
 
-### Q9. Why do you want to work here?
+### Q9. Why are you leaving your current job?
 
-> "I've researched [Company] and I'm impressed by [*specific product, project, or value*]. My experience building distributed systems with Spring Boot and managing full deployment pipelines aligns well with what your team is doing.
+> "I've learned a lot in my current role — I've grown from building simple APIs to architecting entire microservice platforms. But I've reached a point where I want to tackle **larger-scale challenges in a domain where reliability is critical**. Banking offers exactly that — systems where data consistency, security, and uptime are non-negotiable.
 >
-> I'm especially excited about [*specific technical challenge or growth opportunity at the company*]. I want to work somewhere where engineering quality matters, and from what I've seen — the way you [*specific observation*] — this is that kind of place."
-
-*Tip: ALWAYS research the company before the interview. Mention specific products, values, or recent news. Generic answers like "I want to grow" sound lazy.*
-
----
-
-### Q10. Why are you leaving your current job?
-
-> "I've learned a lot in my current role — I've grown from building simple APIs to architecting entire microservice platforms. But I've reached a point where I want to tackle larger-scale challenges and work with a more experienced team where I can learn from senior engineers.
->
-> I'm not running away from anything — I'm running toward a bigger opportunity."
+> I'm also excited about working with a more experienced team in a structured engineering environment. Banks typically have stronger code review processes, compliance requirements, and change management practices — and I want to grow in that kind of disciplined culture."
 
 **Answers to AVOID:**
 - ❌ "My boss is terrible" → Shows you might badmouth them too
@@ -164,80 +162,87 @@ A curated list of behavioral and HR interview questions with personalized answer
 - ❌ "I'm bored" → Shows low initiative
 - ❌ "There's too much work" → Raises red flags about work ethic
 
-*Tip: Keep it positive. Focus on what you're moving TOWARD, not what you're leaving.*
+*Tip: Frame it as growth toward banking's higher standards, not running away from something.*
 
 ---
 
-### Q11. Where do you see yourself in 5 years?
+### Q10. Where do you see yourself in 5 years?
 
-> "In 5 years, I want to be a **senior or lead engineer** — someone who not only writes excellent code but also mentors junior developers, makes architectural decisions, and contributes to the engineering culture. I want to deepen my expertise in distributed systems while expanding into areas like platform engineering.
+> "In 5 years, I want to be a **senior or lead engineer** in the banking/fintech space — someone who not only writes excellent code but also **sets architectural standards for transaction processing systems, mentors junior developers on building secure and reliable services**, and contributes to the bank's technology strategy.
 >
-> I'm looking for a company where that kind of growth is supported, and where I can make increasingly larger contributions over time."
+> I want to deepen my expertise in distributed systems, payment processing, and security while expanding into areas like **platform engineering and compliance automation**. Banking is a domain where deep expertise compounds over time, and I want to build that long-term expertise here."
 
-*Tip: Show ambition but stay realistic. Align with the company's growth path. Don't say "I want your job" or "I want to start my own company."*
+*Tip: Banks value loyalty — show you're in it for the long haul, not jumping ship in 2 years.*
 
 ---
 
-### Q12. What motivates you?
+### Q11. What motivates you?
 
-> "I'm motivated by **building things that people actually use**. The best feeling is when a system I designed handles real production traffic smoothly — like when the weather alert system I built sent its first automated flood warning to farmers. That's real impact.
+> "I'm motivated by **building systems that people trust with their money**. The best feeling is when a system I designed handles real production traffic smoothly — knowing that every transfer, every payment, every balance check is processed correctly because the backend I built is reliable.
 >
-> I'm also motivated by learning. This industry changes fast, and I genuinely enjoy staying current — whether that's picking up a new framework, understanding a new architectural pattern, or experimenting with AI integration."
+> I'm also motivated by the challenge of **preventing things from going wrong**. In banking, you don't just build features — you think about edge cases, race conditions, and security threats. That kind of adversarial thinking is intellectually stimulating and deeply satisfying when you get it right."
 
-*Tip: Be genuine. Connect it to real examples from your work.*
+*Tip: Connect your motivation to the banking mission — trust, reliability, and protecting people's money.*
 
 ---
 
-### Q13. How do you prioritize when everything is urgent?
+### Q12. How do you prioritize when everything is urgent?
 
-> "First, I **clarify what's actually urgent vs what feels urgent**. I ask: what breaks if we don't do this today? That usually narrows the list.
+> "First, I **assess impact and risk**. In banking, I always ask: *'What's the financial impact if we don't fix this now?'* A bug that causes incorrect account balances gets fixed before a UI alignment issue — regardless of who's requesting it.
 >
-> Then I use a simple framework: **impact × effort**. High-impact, low-effort items go first. For the rest, I communicate with stakeholders to set expectations — 'I can do A today and B by Wednesday. Does that work?'
+> Then I use a simple framework: **severity × blast radius**. A production payment failure affecting all users is P0. A reporting query that's slow but correct is P2. For everything in between, I communicate with stakeholders to set expectations — 'I can fix the payment issue today and address the report optimization by Wednesday. Does that work?'
 >
-> The worst thing is to say yes to everything and deliver nothing. It's better to under-promise and over-deliver."
+> The worst thing in banking is to say yes to everything and deliver nothing. It's better to under-promise and over-deliver — especially when people's money is involved."
 
 ---
 
-### Q14. What is your expected salary?
+### Q13. What is your expected salary?
 
-> "Based on my 4 years of experience, the scope of systems I've built, and the market rate for senior Spring Boot engineers in [*location/market*], I'm looking for a range of [*$X – $Y*].
+> "Based on my 4 years of experience, the scope of systems I've built, and the market rate for senior Spring Boot engineers in Cambodia's banking sector, I'm looking for a range of [*$X – $Y*].
 >
-> That said, compensation isn't just about base salary for me — I also value benefits like health insurance, learning opportunities, and flexible working arrangements. I'm open to discussing a package that works for both sides."
+> That said, I value the stability and benefits that banking offers — health insurance, annual bonuses, structured career growth — and I'm open to discussing a total compensation package that works for both sides."
 
-**Tips:**
-- **Research the market** before the interview — check Glassdoor, LinkedIn, or ask in Cambodian developer communities
+**Tips for banking salary negotiation:**
+- **Research the market** — banking typically pays 15-30% above startups in Cambodia for equivalent roles
 - **Give a range**, not a single number — it shows flexibility while setting a floor
+- **Factor in benefits** — banks often offer better benefits packages (insurance, bonuses, leave)
 - **Never give your number first** if you can avoid it — ask "What's the budgeted range for this role?"
-- **In Cambodia**: Be aware that salary negotiation is expected. Your first offer is usually not the final offer.
+- **In Cambodia**: salary negotiation is expected. Your first offer is usually not the final offer.
+- **Banking-specific perks to ask about**: loan interest discounts, NSSF, health/life insurance coverage
 
 ---
 
-## 📝 Preparation Checklist
+## 📝 Preparation Checklist — Banking Interview
 
-- [ ] Research the company and its products (check their website, Facebook page)
-- [ ] Review the job description thoroughly
-- [ ] Prepare 2-3 stories using STAR method (Situation, Task, Action, Result)
+- [ ] Research the bank's products (mobile app, KHQR adoption, digital banking services)
+- [ ] Review the job description thoroughly — note any banking-specific requirements
+- [ ] Prepare 2-3 stories using STAR method (include data integrity, reliability themes)
+- [ ] Understand basic banking concepts: core banking, T24/Temenos, ISO 8583, SWIFT
+- [ ] Know NBC (National Bank of Cambodia) basics — digital payment regulations, KHQR
 - [ ] Prepare questions to ask the interviewer (see [9-questions-to-ask.md](./9-questions-to-ask.md))
 - [ ] Test your tech setup (for remote interviews) — internet, camera, mic
 - [ ] Have your resume, portfolio, and GitHub ready
 - [ ] Plan your route and timing (Phnom Penh traffic can be unpredictable!)
-- [ ] Prepare for English language assessment (common in Cambodian interviews)
-- [ ] Know your salary range before walking in
+- [ ] Prepare for English language assessment (common in banking interviews)
+- [ ] Know your salary range before walking in (research banking engineer salaries)
 - [ ] Prepare a 1-minute and 2-minute version of "Tell me about yourself"
+- [ ] Review security fundamentals — OAuth2 flows, JWT, encryption basics
 
 ---
 
-## 💡 Tips for Cambodian Engineers
+## 💡 Tips for Banking Interviews in Cambodia
 
-- **Be honest** — It's okay to say "I don't know, but I'd love to learn."
-- **Think out loud** — Interviewers want to see your thought process.
-- **Ask clarifying questions** — Don't assume; confirm requirements.
+- **Be honest** — It's okay to say "I don't know, but I'd love to learn." Banks value integrity.
+- **Think about failure scenarios** — Interviewers want to see that you consider what could go wrong.
+- **Mention data integrity** — Use phrases like "audit trail", "data consistency", "transaction safety".
+- **Show security awareness** — Even basic understanding of encryption, OAuth2, and PCI DSS helps.
 - **Stay calm** — Take a breath before answering tough questions.
-- **Show willingness to learn** — Cambodian tech scene values growth mindset.
-- **Highlight team experience** — Many companies value collaboration over solo work.
-- **Prepare for English tests** — Some companies assess technical English skills.
-- **Follow up** — Send a thank-you message within 24 hours (Telegram or email).
-- **Dress appropriately** — Business casual is usually safe in Phnom Penh offices.
+- **Show long-term commitment** — Banks invest in training; they want people who will stay.
+- **Highlight team experience** — Banking projects are team efforts, not solo heroics.
+- **Prepare for English tests** — Banks assess technical English skills, especially international banks.
+- **Understand compliance** — Know that banking code changes require review, testing, and approval processes.
+- **Follow up** — Send a thank-you message within 24 hours (email, not Telegram — banks are more formal).
+- **Dress professionally** — Business formal or business casual. Banks are more conservative than tech startups.
 - **Arrive early** — Traffic in Phnom Penh can be unpredictable!
 - **Negotiate salary** — It's expected. Don't accept the first offer without discussion.
 - **Bring copies of your resume** — Some interviewers won't have it printed.

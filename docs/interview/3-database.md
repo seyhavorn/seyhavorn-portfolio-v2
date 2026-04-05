@@ -1,4 +1,4 @@
-# Senior Backend Interview — Database & Persistence
+# Senior Backend Interview — Database & Persistence (Banking/Fintech)
 
 ---
 
@@ -414,3 +414,127 @@ public void managePartitions() {
 - Queries frequently span all partitions — no benefit from pruning
 - No natural partition key in your access patterns
 
+---
+
+### Q11. What is a database deadlock and how do you prevent or handle it?
+
+**Deadlock** occurs when two or more transactions hold locks and each waits for the other to release their lock, creating a cycle of dependencies. Neither transaction can proceed.
+
+**Example Scenario:**
+- Transaction 1 locks Row A, needs Row B
+- Transaction 2 locks Row B, needs Row A
+→ Database detects deadlock and aborts one transaction (victim).
+
+**How to prevent deadlocks:**
+1. **Always access resources in the exact same order** across all transactions. If every service locks Order then Payment, they will never deadlock.
+2. **Sort items before batch updates.** If updating multiple rows, order them by ID before issuing the UPDATE.
+3. **Use smaller transactions.** Keep transactions short and only wrap database operations (do external API calls before starting the transaction).
+4. **Use appropriate isolation levels.** Don't use SERIALIZABLE if READ COMMITTED is sufficient.
+5. **Use optimistic locking (@Version in JPA)** instead of pessimistic locking when conflicts are rare.
+
+**How to handle deadlocks in Spring:**
+If a deadlock occurs, the DB throws an exception (e.g., `DeadlockLoserDataAccessException`). You can implement automatic retries using `@Retryable` (from Spring Retry).
+```java
+@Retryable(
+    value = DeadlockLoserDataAccessException.class, 
+    maxAttempts = 3, 
+    backoff = @Backoff(delay = 100))
+@Transactional
+public void processPayment() { ... }
+```
+
+---
+
+### Q12. Explain OFFSET/LIMIT vs Keyset Pagination (Cursor Pagination). Why is OFFSET bad for large tables?
+
+**OFFSET/LIMIT Pagination:**
+```sql
+SELECT * FROM transactions ORDER BY created_at DESC LIMIT 50 OFFSET 100000;
+```
+**Why it's bad:** To skip 100,000 rows, the database must generate and discard all 100,000 rows before returning the 50 you want. As the OFFSET grows, query time increases linearly (can take seconds or minutes on large tables).
+
+**Keyset Pagination (Cursor Pagination):**
+```sql
+SELECT * FROM transactions 
+WHERE (created_at, id) < ('2023-10-01 12:00:00', 5012)
+ORDER BY created_at DESC, id DESC 
+LIMIT 50;
+```
+**Why it's better:** The database uses the index on `(created_at, id)` to instantly jump to the cursor position and read the next 50 rows. Performance remains constant (O(1) index lookup) regardless of how deep you paginate.
+
+**Trade-offs:**
+- You cannot jump directly to "Page 500" (no page numbers).
+- The cursor column must be strictly unique (usually combination of timestamp + ID).
+
+---
+
+### Q13. What is a Materialized View in PostgreSQL and when should you use it?
+
+A standard `VIEW` executes its underlying query every time it is accessed.
+A **Materialized View** executes the query once and saves the result physically on disk. 
+
+**Use Cases:** 
+- Aggregating historical data (e.g., Daily Sales Reports dashboard)
+- Complex JOINs across many tables that rarely change
+- Pre-computing statistics 
+
+**Drawback:** The data becomes stale. It must be manually refreshed.
+
+**Syntax:**
+```sql
+CREATE MATERIALIZED VIEW daily_sales AS
+SELECT date_trunc('day', created_at) AS day, SUM(amount) AS total
+FROM orders
+GROUP BY 1;
+```
+
+**Refreshing:**
+```sql
+-- Locks the view while refreshing (blocking reads)
+REFRESH MATERIALIZED VIEW daily_sales;
+
+-- Requires a UNIQUE index on the view. Refreshes concurrently without blocking reads!
+REFRESH MATERIALIZED VIEW CONCURRENTLY daily_sales;
+```
+
+---
+
+### Q14. Explain the CAP theorem. How does it apply to databases?
+
+The CAP Theorem states that a distributed data store can only simultaneously provide two out of three guarantees:
+- **Consistency (C):** Every read receives the most recent write or an error.
+- **Availability (A):** Every request receives a (non-error) response, without guarantee that it contains the most recent write.
+- **Partition Tolerance (P):** The system continues to operate despite an arbitrary number of messages being dropped/delayed by the network between nodes.
+
+**Since network partitions (P) are unavoidable in distributed systems, you must choose between C and A:**
+
+- **CP (Consistency over Availability):** 
+  - If a node goes down, the system rejects requests to ensure no stale data is read.
+  - Examples: MongoDB, HBase, Redis (in Cluster mode depending on config).
+  - Use case: Banking balances.
+
+- **AP (Availability over Consistency):**
+  - If a node goes down, the system returns the local, potentially stale data (Eventual Consistency).
+  - Examples: Cassandra, DynamoDB, CouchDB.
+  - Use case: Social media feeds, product reviews.
+
+- **CA Systems (Relational DBs):** 
+  - Standard PostgreSQL / MySQL without distributed clustering are CA systems. They do not tolerate network partitions between nodes because they are fundamentally single-node masters.
+
+---
+
+### Q15. How do you implement safely database schema migrations in a CI/CD pipeline?
+
+Instead of running SQL scripts manually, you use version control tools like **Flyway** or **Liquibase**.
+
+**The Process (Flyway):**
+1. Store SQL scripts in `src/main/resources/db/migration` (e.g., `V1__init.sql`, `V2__add_users.sql`).
+2. On application startup, Flyway checks a `flyway_schema_history` table in the DB.
+3. It compares the checksums of existing files against the DB.
+4. If a new file is detected, it runs it. If an old file was modified, it throws an error (immutability).
+
+**Best Practices for CI/CD:**
+- **Backward Compatibility:** Migrations MUST be backward compatible (Expand-Contract pattern). The old version of the app must run alongside the new version of the app while the DB migrates (Blue-Green Deployment).
+- **Never modify existing scripts:** Always create a new script (e.g., `V3__fix_view.sql`).
+- **Idempotency:** Write `CREATE TABLE IF NOT EXISTS` or `ADD COLUMN IF NOT EXISTS` if possible.
+- **Validate in CI:** Use Testcontainers in your CI pipeline to spin up a fresh PostgreSQL container, run all Flyway migrations from V1 to V_Current, and ensure no syntax errors exist.

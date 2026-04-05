@@ -1,4 +1,4 @@
-# Senior Backend Interview — DevOps & Cloud Infrastructure
+# Senior Backend Interview — DevOps & Cloud Infrastructure (Banking/Fintech)
 
 ---
 
@@ -478,3 +478,84 @@ EOF
 | Audit trail required | ❌ No history | ✅ Full execution logs |
 | 10+ services, multiple envs | ❌ Script sprawl | ✅ Organized pipelines |
 
+---
+
+### Q11. What is Docker Swarm and how does it compare to Kubernetes?
+
+**Docker Swarm** is Docker's native clustering and orchestration tool. It turns a pool of Docker hosts into a single, virtual Docker host.
+
+| Feature | Docker Swarm | Kubernetes (K8s) |
+|---|---|---|
+| **Learning Curve** | Gentle. Uses standard Docker Compose syntax. | Steep. Requires learning new YAML manifests (Pods, Deployments, Services). |
+| **Setup & Maintenance** | Simple. Built into the Docker engine (`docker swarm init`). | Complex. Requires external tools (kubeadm, k3s, managed cloud services like EKS/GKE). |
+| **Feature Set** | Basic orchestration (Deploy, Scale, Rollout, Secrets). | Advanced orchestration (StatefulSets, DaemonSets, Auto-scaling, CRDs, Helm). |
+| **Target Audience** | Small to medium applications, bare-metal servers, teams without dedicated DevOps engineers. | Enterprise-scale, highly scalable cloud applications, complex microservice architectures. |
+| **Networking** | Overlay networks built-in. | Requires CNI plugins (Flannel, Calico). |
+
+**Why use Docker Swarm today?**
+If you have a monolithic application or a small set of microservices (like 5-10) running on a few VMs, Kubernetes is often overkill and introduces unnecessary maintenance overhead. Docker Swarm provides high availability, rolling updates, and service discovery out-of-the-box using the `docker-compose.yml` you already wrote.
+
+---
+
+### Q12. How do you deploy and manage a Spring Boot stack using Docker Swarm?
+
+**1. Initialize the Swarm (on the Manager Node):**
+```bash
+docker swarm init --advertise-addr <MANAGER-IP>
+```
+*This node becomes the manager. It outputs a join token.*
+
+**2. Join Worker Nodes to the Swarm (run on other nodes):**
+```bash
+docker swarm join --token <TOKEN> <MANAGER-IP>:2377
+```
+
+**3. Define the Application (Swarm Stack with `docker-compose.yml`):**
+In Swarm, you use `docker stack deploy` alongside a Compose file extended with `deploy` configuration.
+
+```yaml
+version: "3.8"
+services:
+  gateway:
+    image: cas/gateway:${IMAGE_TAG:-latest}
+    ports:
+      - "80:8080"
+    deploy:
+      replicas: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == manager # Gateway only runs on manager
+    networks:
+      - cas_network
+
+  weather-service:
+    image: cas/weather:${IMAGE_TAG:-latest}
+    deploy:
+      replicas: 5 # Scale weather service to 5 instances
+      placement:
+        constraints:
+          - node.role == worker # Service runs on worker nodes
+    networks:
+      - cas_network
+
+networks:
+  cas_network:
+    driver: overlay # Crucial: Overlay network allows containers on different nodes to communicate
+```
+
+**4. Deploy the Stack:**
+```bash
+IMAGE_TAG=v1.2.0 docker stack deploy -c docker-compose.yml my_spring_app
+```
+
+**5. Useful Swarm Commands:**
+- `docker stack ls` / `docker stack ps my_spring_app`: List stacks / view task status.
+- `docker service scale my_spring_app_weather-service=10`: Manually scale a service.
+- `docker service logs -f my_spring_app_weather-service`: View logs aggregated across all nodes.
+- `IMAGE_TAG=v1.3.0 docker stack deploy -c docker-compose.yml my_spring_app`: Perform a rolling update to a new version.

@@ -1,4 +1,4 @@
-# Senior Backend Interview — AI Integration
+# Senior Backend Interview — AI Integration (Banking/Fintech)
 
 ---
 
