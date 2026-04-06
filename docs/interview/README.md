@@ -27,8 +27,9 @@ A comprehensive Q&A collection tailored for **Senior Backend Developer** intervi
 | 7 | **Data Structures & Algorithms (DSA)** | 30 Q&A | [7-dsa.md](./7-dsa.md) |
 | 8 | **Design Patterns & SOLID** | 25 Q&A | [8-design-patterns.md](./8-design-patterns.md) |
 | 9 | **Questions to Ask HR & Manager** | 42 Questions | [9-questions-to-ask.md](./9-questions-to-ask.md) |
+| 10 | **Banking System Architecture** | 10 Q&A | [10-banking-system-architecture.md](./10-banking-system-architecture.md) |
 
-**Total: 215+ Questions & Answers**
+**Total: 225+ Questions & Answers**
 
 ---
 
@@ -82,3 +83,6 @@ SOLID Principles, Singleton, Factory, Builder, Strategy (payment routing), Obser
 
 ### 9. Questions to Ask
 Team & role questions, Technology & practices, Growth & culture, Compensation & benefits, Work environment, Company culture, Hiring process, Red flags, Banking-specific questions (compliance, on-call, change management)
+
+### 10. Banking System Architecture
+Transaction Consistency (Saga, 2PC, Outbox), Idempotency, Concurrency & Locking, Security (OAuth2, Encryption), Event Sourcing, Isolation Levels, Rate Limiting & Fraud, CQRS, Circuit Breakers, RED/USE Metrics

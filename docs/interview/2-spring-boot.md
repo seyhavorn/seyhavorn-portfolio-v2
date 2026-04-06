@@ -2152,3 +2152,170 @@ Senior developers are expected to troubleshoot production issues.
 - Scenario: Memory leak (e.g., keeping objects in a static Map).
 - Tool: Obtain a Heap Dump (`jmap -dump:live,format=b,file=heap.hprof <pid>`) or ideally, configure the JVM to dump automatically on OOM (`-XX:+HeapDumpOnOutOfMemoryError`).
 - Analysis: Analyze the heap dump using Eclipse MAT (Memory Analyzer Tool) or VisualVM to find the "GCRoots" holding onto memory.
+
+---
+
+### Q46. Explain the inner workings of SpringApplication.run() and the startup lifecycle.
+
+When you call `SpringApplication.run()` in the `main` method, Spring Boot goes through several distinct phases to bootstrap the application:
+
+1. **Setup Phase:**
+   - Creates a new `SpringApplication` instance.
+   - Deduces the application type (Web MVC, WebFlux, or None) based on classpath.
+   - Loads `ApplicationContextInitializer`s and `ApplicationListener`s registered in `spring.factories`.
+2. **Execution Phase (`run()` invoked):**
+   - **`SpringApplicationRunListener`:** Fires `starting()` event.
+   - **Environment Preparation:** Creates and configures the `Environment` (profiles, properties) and fires `environmentPrepared()`.
+   - **Banner Printing:** Prints the Spring/Custom Banner.
+   - **Context Creation:** Creates the appropriate `ApplicationContext` (e.g., `AnnotationConfigServletWebServerApplicationContext`).
+   - **Context Preparation:** Injects the `Environment`, applies initializers, and fires `contextPrepared()`. It then loads the bean definitions from your main class and fires `contextLoaded()`.
+   - **Context Refresh (`refreshContext`):** The core Spring framework takes over. This is where bean factories are initialized, singleton beans are instantiated, and the embedded web server (Tomcat/Jetty) is started.
+   - **Runners:** Executes any `ApplicationRunner` or `CommandLineRunner` beans for post-startup custom logic.
+   - **Ready:** Fires the `ready()` event — the app is now fully started and accepting traffic.
+
+---
+
+### Q47. How do `ApplicationRunner` and `CommandLineRunner` work, and when would you use them?
+
+Both are functional interfaces provided by Spring Boot to execute custom code *just before* `SpringApplication.run()` completes (after the application context is fully loaded).
+
+**`CommandLineRunner`:**
+Exposes raw string arguments passed to the application.
+```java
+@Component
+public class MyStartupTask implements CommandLineRunner {
+    @Override
+    public void run(String... args) {
+        System.out.println("Raw args: " + Arrays.toString(args));
+    }
+}
+```
+
+**`ApplicationRunner`:**
+Exposes an `ApplicationArguments` object, which provides parsed arguments (e.g., separating option arguments like `--foo=bar` from non-option arguments).
+```java
+@Component
+public class CachePreloader implements ApplicationRunner {
+    @Override
+    public void run(ApplicationArguments args) {
+        if (args.containsOption("preload-cache")) {
+            // Preload heavy data into Redis on startup
+        }
+    }
+}
+```
+
+**Ordering:** If you have multiple runners, use the `@Order` annotation or implement the `Ordered` interface to dictate their execution sequence.
+
+---
+
+### Q48. What are Spring Boot "Starter" dependencies, and how do you create a custom Starter?
+
+**Starter Dependencies** are a set of convenient dependency descriptors that you can include in your application. They aggregate common dependencies to build a specific type of capability (e.g., `spring-boot-starter-web` brings in Spring MVC, Tomcat, Jackson, etc.). This solves the problem of "dependency hell" and version mismatches, as Spring Boot's BOM (Bill of Materials) ensures compatible versions are resolved.
+
+**Creating a Custom Starter (e.g., for an internal corporate library):**
+1. **Naming Convention:** Official starters are named `spring-boot-starter-*`. Third-party/custom starters should be named `*-spring-boot-starter` (e.g., `company-auth-spring-boot-starter`).
+2. **Create an Auto-Configuration Class:**
+   ```java
+   @AutoConfiguration
+   @ConditionalOnClass(InternalAuthService.class)
+   @EnableConfigurationProperties(AuthProperties.class)
+   public class CompanyAuthAutoConfiguration {
+       @Bean
+       @ConditionalOnMissingBean
+       public InternalAuthService authService(AuthProperties props) {
+           return new InternalAuthService(props.getApiKey());
+       }
+   }
+   ```
+3. **Register the Auto-Configuration:**
+   - In Spring Boot 2.7+, create: `src/main/resources/META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports` containing the fully qualified class name: `com.company.auth.CompanyAuthAutoConfiguration`.
+4. **Create the Starter Module:** Create a separate `pom.xml` that depends on your auto-configuration module and the required specific libraries, allowing projects to include just one unified dependency.
+
+---
+
+### Q49. How does Spring Boot manage the embedded web server, and how do you customize it?
+
+Unlike traditional Spring applications deployed as WAR files into an external Tomcat container, Spring Boot apps run as standalone Java applications containing an **Embedded Web Server** (Tomcat by default, but Jetty and Undertow are supported).
+
+**How it works:**
+During the `refresh()` phase of the ApplicationContext, Spring Boot creates a `ServletWebServerFactory` bean (e.g., `TomcatServletWebServerFactory`). This factory programmatically builds and starts the Tomcat instance, registering the Spring `DispatcherServlet` to handle incoming requests.
+
+**Customizing the Server:**
+1. **Via `application.yml` (Most common):**
+   ```yaml
+   server:
+     port: 8081
+     tomcat:
+       max-threads: 200
+       connection-timeout: 20000ms
+     compression:
+       enabled: true
+   ```
+
+2. **Programmatically (`WebServerFactoryCustomizer`):**
+   ```java
+   @Component
+   public class CustomServerConfig implements WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> {
+       @Override
+       public void customize(ConfigurableServletWebServerFactory factory) {
+           factory.setPort(8082); // overrides properties
+       }
+   }
+   ```
+
+**Switching from Tomcat to Undertow (for better non-blocking performance):**
+Exclude Tomcat from the web starter and add Undertow:
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+    <exclusions>
+        <exclusion>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-undertow</artifactId>
+</dependency>
+```
+
+---
+
+### Q50. What is a `FailureAnalyzer` in Spring Boot?
+
+When a Spring Boot application starts and fails due to initialization errors (e.g., port already in use, missing database configuration), it typically spits out a massive, intimidating stack trace. Spring Boot uses **`FailureAnalyzer`s** to intercept specific startup exceptions and convert them into readable, actionable diagnostic messages without the overwhelming stack trace.
+
+**Example of built-in FailureAnalyzer output:**
+```
+***************************
+APPLICATION FAILED TO START
+***************************
+Description:
+Web server failed to start. Port 8080 was already in use.
+
+Action:
+Identify and stop the process that's listening on port 8080 or configure this application to listen on another port.
+```
+
+**Creating a custom `FailureAnalyzer`:**
+1. Extend `AbstractFailureAnalyzer`:
+```java
+public class MyCustomFailureAnalyzer extends AbstractFailureAnalyzer<MyConfigException> {
+    @Override
+    protected FailureAnalysis analyze(Throwable rootFailure, MyConfigException cause) {
+        return new FailureAnalysis(
+            "Service key is missing.", // Description
+            "Add 'my.service.key' to your application.yml.", // Action
+            cause);
+    }
+}
+```
+2. Register it in `META-INF/spring.factories`:
+```properties
+org.springframework.boot.diagnostics.FailureAnalyzer=\
+com.example.MyCustomFailureAnalyzer
+```

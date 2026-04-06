@@ -42,25 +42,25 @@ A curated list of behavioral and HR interview questions with personalized answer
 
 **A (Full Script — 2 minutes):**
 
-> "Hi, I'm Seyha — a backend-focused software engineer with 4 years of experience specializing in **Java 21, Spring Boot,** and **microservices architecture**.
+> "Hi, I'm Seyha. I'm a backend-focused software engineer with 4 years of experience, specializing in **Java, Spring Boot, and microservices architecture**. Throughout my career, I've focused on building resilient, high-throughput systems that process complex data reliably.
 >
-> My most significant project was architecting a **12-service microservices platform** for Cambodia's Ministry of Agriculture, under the **FAO PEARL Project**. It's an agrometeorological early-warning system that processes real-time climate data from NOAA and ECMWF, runs it through domain-specific risk engines — flood, drought, cyclone, pest & disease — and delivers advisory bulletins and push notifications to farming communities across Cambodia. I designed the full architecture using **Spring Cloud** — Eureka for service discovery, Spring Cloud Gateway, Resilience4j for circuit breaking, RabbitMQ for event-driven notifications, and **PostGIS** for geospatial processing.
+> My most significant achievement was architecting a **12-service microservices platform** for the Cambodia Agrometeorological Service (ADS-CAS) under the UN FAO PEARL project. I designed the entire backend using **Spring Cloud, RabbitMQ, and PostgreSQL with PostGIS**. The system ingests large-scale climate data from organizations like NOAA, runs it through automated risk engines, and triggers real-time early warning notifications for farmers. Designing that system taught me how to handle distributed transactions, event-driven architectures, and high-availability deployments.
 >
-> Beyond that, I've built enterprise-grade systems including a **CRM platform**, **multi-tenant CMS**, and an **SMS gateway service** — all using Java 21 and Spring Boot with PostgreSQL, Redis, and Liquibase for database migrations. These systems handle **data consistency, concurrent processing, and transaction integrity** — concerns that directly align with banking backend challenges.
+> Besides that, I've developed several enterprise systems—including a full-scale **CRM platform, a high-throughput SMS gateway service, and a multi-tenant CMS integrated with Directus**. In all these projects, I prioritized **data consistency, distributed locking with Redis, and idempotent APIs**—which I know are critical patterns for banking and fintech systems.
 >
-> What sets me apart is that I own the **full deployment lifecycle** — not just writing code. I containerize applications with **Docker and Jib**, orchestrate with **Docker Compose**, manage **CI/CD pipelines**, and administer **Ubuntu production servers** and **AWS infrastructure**. I've also implemented **idempotent payment-style APIs, distributed locking with Redis, and event-driven architectures** with exactly-once processing guarantees.
+> Furthermore, I don't just write code. I own the **full deployment lifecycle**. I'm hands-on with containerization using Docker, configuring CI/CD pipelines, and managing Ubuntu servers and AWS infrastructure. 
 >
-> I'm now looking to bring this experience to banking — where **data integrity, security, and system reliability** are non-negotiable. The financial domain excites me because every line of code has real consequences for people's money and trust."
+> Right now, I'm looking to transition into the banking sector because I want to work in an environment where engineering rigor, security, and transaction integrity are absolutely non-negotiable. I want to build systems that people trust with their financial lives."
 
 **A (Short Version — 1 minute):**
 
-> "I'm Seyha, a backend engineer with 4 years of experience in Java and Spring Boot. I've architected a 12-microservice platform that processes real-time data with high reliability requirements — including distributed transactions, idempotent APIs, and event-driven processing. I've also built enterprise CRM and multi-tenant platforms. I handle the full stack from code to deployment — Docker, CI/CD, and server administration. I'm looking to apply these skills in banking where data integrity and system reliability are critical."
+> "Hi, I'm Seyha, a backend software engineer with 4 years of experience specializing in Java 21 and Spring Boot. I recently architected a 12-microservice early-warning platform for the UN FAO, designing everything from the system architecture using Spring Cloud and RabbitMQ to managing the CI/CD and AWS deployments. I've also built enterprise CRMs and high-throughput SMS gateways, focusing heavily on idempotent APIs, event-driven processing, and data consistency. I'm now looking to bring my experience in building highly reliable, distributed systems to the banking industry, where transaction integrity and security are paramount."
 
 **Tips for banking interviews:**
-- **Emphasize reliability and data integrity** — banks want engineers who think about what happens when things fail
-- **Mention security awareness** — even if it wasn't your primary focus, show you understand it matters
-- **Show you understand the domain** — terms like "transaction consistency", "audit trails", "idempotency" resonate with banking interviewers
-- **Don't rush** — pausing between key points makes you sound confident and thoughtful
+- **Emphasize reliability and data integrity** — banks want engineers who think about what happens when things fail.
+- **Mention full-stack ownership** — taking responsibility from code to cloud shows maturity.
+- **Show you understand the domain** — weave in terms like "idempotent APIs", "data consistency", and "distributed transactions".
+- **Keep it conversational** — don't sound like you're reading a script. Pause naturally.
 
 ---
 
