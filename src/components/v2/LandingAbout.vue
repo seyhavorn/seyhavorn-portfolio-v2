@@ -14,10 +14,7 @@
         Crafting <span class="text-gradient">Scalable</span> & <span class="text-gradient">Intelligent</span> Systems
       </h2>
 
-      <div class="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-12 lg:gap-16 items-center">
-
-        <!-- Left: Text content -->
-        <div>
+      <div class="max-w-4xl">
           <p class="text-[16px] md:text-[17px] leading-[1.9] text-[var(--text-secondary)] font-light mb-8">
             {{ profile.summary }}
           </p>
@@ -64,30 +61,6 @@
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- Right: Photo card -->
-        <div class="relative mx-auto lg:mx-0">
-          <div class="relative group">
-            <!-- Glowing border card -->
-            <div class="absolute -inset-[2px] bg-gradient-to-br from-teal-400 via-blue-500 to-purple-600 rounded-3xl opacity-60 group-hover:opacity-100 blur-sm transition-all duration-500"></div>
-            <div class="relative bg-[var(--bg)] rounded-3xl p-[3px]">
-              <img
-                :src="info.photoUrl"
-                :alt="`${info.firstName} ${info.lastName}`"
-                loading="lazy"
-                width="380"
-                height="507"
-                class="w-full max-w-[380px] aspect-[3/4] object-cover object-center rounded-[21px] grayscale-[20%] group-hover:grayscale-0 transition-all duration-700"
-              />
-            </div>
-            <!-- Floating badge -->
-            <div class="absolute -bottom-4 -right-4 glass-card px-4 py-3 flex items-center gap-2 shadow-2xl border-teal-500/30">
-              <span class="w-3 h-3 rounded-full bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.8)]"></span>
-              <span class="font-mono text-[12px] text-teal-300 tracking-wide">{{ info.experienceDuration }} exp</span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </section>
