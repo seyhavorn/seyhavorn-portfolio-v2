@@ -17,17 +17,17 @@ A comprehensive Q&A collection tailored for **Senior Backend Developer** intervi
 
 | # | Topic | Questions | File |
 |---|-------|-----------|------|
-| 0 | **Behavioral & HR Questions** | 14 Q&A (banking-tailored scripts) | [0-behavioral-questions.md](./0-behavioral-questions.md) |
-| 1 | **Backend Architecture & System Design** | 18 Q&A | [1-backend.md](./1-backend.md) |
-| 2 | **Spring Boot** | 45 Q&A | [2-spring-boot.md](./2-spring-boot.md) |
-| 3 | **Database & Persistence** | 15 Q&A | [3-database.md](./3-database.md) |
-| 4 | **DevOps & Cloud Infrastructure** | 12 Q&A | [4-devops.md](./4-devops.md) |
-| 5 | **AI Integration** | 6 Q&A | [5-ai-integration.md](./5-ai-integration.md) |
-| 6 | **Unit Testing & Quality Assurance** | 8 Q&A | [6-unit-testing.md](./6-unit-testing.md) |
-| 7 | **Data Structures & Algorithms (DSA)** | 30 Q&A | [7-dsa.md](./7-dsa.md) |
-| 8 | **Design Patterns & SOLID** | 25 Q&A | [8-design-patterns.md](./8-design-patterns.md) |
-| 9 | **Questions to Ask HR & Manager** | 42 Questions | [9-questions-to-ask.md](./9-questions-to-ask.md) |
-| 10 | **Banking System Architecture** | 10 Q&A | [10-banking-system-architecture.md](./10-banking-system-architecture.md) |
+| 0 | **Behavioral & HR Questions** | 14 Q&A (banking-tailored scripts) | [0.behavioral-questions.md](./1.behavioral-questions.md) |
+| 1 | **Backend Architecture & System Design** | 18 Q&A | [1.backend.md](./2.backend.md) |
+| 2 | **Spring Boot** | 45 Q&A | [2.spring-boot.md](./3.spring-boot.md) |
+| 3 | **Database & Persistence** | 15 Q&A | [3.database.md](./4.database.md) |
+| 4 | **DevOps & Cloud Infrastructure** | 12 Q&A | [4.devops.md](./5.devops.md) |
+| 5 | **AI Integration** | 6 Q&A | [5.ai-integration.md](./6.ai-integration.md) |
+| 6 | **Unit Testing & Quality Assurance** | 8 Q&A | [6.unit-testing.md](./7.unit-testing.md) |
+| 7 | **Data Structures & Algorithms (DSA)** | 30 Q&A | [7.dsa.md](./8.dsa.md) |
+| 8 | **Design Patterns & SOLID** | 25 Q&A | [8.design-patterns.md](./9.design-patterns.md) |
+| 9 | **Questions to Ask HR & Manager** | 42 Questions | [9.questions-to-ask.md](./10.questions-to-ask.md) |
+| 10 | **Banking System Architecture** | 10 Q&A | [10.banking-system-architecture.md](./11.banking-system-architecture.md) |
 
 **Total: 225+ Questions & Answers**
 
