@@ -152,7 +152,7 @@ function onScroll() {
       if (rect.top <= 150) {
         if (activeSection.value !== id) {
           activeSection.value = id
-          router.replace({ hash: `#${id}` })
+          // router.replace({ hash: `#${id}` })
         }
         break
       }
