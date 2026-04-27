@@ -72,7 +72,7 @@ const cvData = {
     githubUrl: "https://github.com/seyhavorn",
   },
   profile: {
-    summary: `Senior Full Stack Software Engineer with ${calcDuration(CAREER_START_YEAR, CAREER_START_MONTH)} of progressive experience. Expert in Spring Boot microservices, Laravel, and Angular/Vue.js ecosystems. Proven track record in AI integration (RAG, Spring AI, Ollama, OpenAI), cloud infrastructure (AWS, Docker, Kubernetes), and high-performance database optimization. Passionate about building scalable, intelligent systems and mentoring engineering teams.`,
+    summary: `Visionary Senior Full Stack Software Engineer with ${calcDuration(CAREER_START_YEAR, CAREER_START_MONTH)} of hands-on experience architecting enterprise-grade solutions. Recognized expert in Spring Boot microservices, Laravel, and modern JavaScript frameworks. Proven track record in AI/ML integration (RAG pipelines, Spring AI, Ollama, OpenAI), cloud-native infrastructure (AWS, Docker, Kubernetes), and high-performance database systems. Passionate about building scalable, intelligent systems and empowering engineering teams to deliver exceptional software.`,
   },
   experiences: [
     // {
@@ -113,7 +113,7 @@ const cvData = {
           period: formatPeriod(2025, 8), // Aug 2025 – Present (dynamic)
           location: "Phnom Penh, Cambodia · On-site",
           description:
-            "Leading backend architecture and microservices design for core platform services. Driving AI integration using Spring AI, RAG pipelines, Ollama, and OpenAI. Owning server setup, domain configuration, and container orchestration on Ubuntu. Mentoring engineers, overseeing DB performance tuning, and establishing cross-team API contracts with observability practices.",
+            "Spearheading backend architecture and microservices design for mission-critical platform services. Pioneering AI integration using Spring AI, RAG pipelines, Ollama, and OpenAI. Owning end-to-end server infrastructure, domain configuration, and container orchestration on Ubuntu. Mentoring engineers, driving DB performance optimization, and establishing cross-team API contracts with observability practices.",
           tags: [
             { name: "Spring Boot", type: "green" },
             { name: "Microservices", type: "green" },
